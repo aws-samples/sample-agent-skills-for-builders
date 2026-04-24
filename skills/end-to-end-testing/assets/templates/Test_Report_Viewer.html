@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<!--
+    ========================================
+    Test Execution Report Viewer Template
+    ========================================
+
+    This HTML template serves as a reference for generating interactive test reports.
+
+    USAGE:
+    1. Use the automated script: python skills/end-to-end-testing/scripts/generate_html_report.py <test-reports-dir>
+    2. Or manually populate the template with test data from markdown files
+
+    DIRECTORY STRUCTURE:
+    The HTML file should be placed in: test-reports/YYYY-MM-DD_HHMMSS/Test_Report_Viewer.html
+
+    ASSET PATHS:
+    - Screenshots: screenshots/ (relative to this HTML file)
+    - Defect reports: defect-reports/ (relative to this HTML file)
+    - Logs: logs/ (relative to this HTML file)
+
+    DATA SOURCES:
+    - Executive summary: test-summary-report.md Section 1
+    - Test statistics: test-case-reports/*.md (count by status)
+    - Test cases: test-case-reports/*.md
+    - Defects: defect-reports/*.md
+    - Screenshots: Auto-discovered from screenshots/ directory
+    - Logs: Auto-discovered from logs/ directory
+
+    NOTE: This is an example template with hardcoded data. Replace with dynamic content from actual test run.
+    ========================================
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Execution Report Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card .number {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-card.passed .number { color: #28a745; }
+        .stat-card.failed .number { color: #dc3545; }
+        .stat-card.blocked .number { color: #ffc107; }
+        .stat-card.total .number { color: #667eea; }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            padding: 0 30px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            color: #666;
+            transition: all 0.3s;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .tab.active {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #667eea;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .test-case {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .test-case-header {
+            padding: 20px;
+            background: #f8f9fa;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .test-case-header:hover {
+            background: #e9ecef;
+        }
+
+        .test-case-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.pass {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.blocked {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .test-case-body {
+            padding: 20px;
+            display: none;
+        }
+
+        .test-case.expanded .test-case-body {
+            display: block;
+        }
+
+        .test-case.expanded .toggle-icon::before {
+            content: '▼';
+        }
+
+        .toggle-icon::before {
+            content: '▶';
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .info-item .label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .info-item .value {
+            color: #212529;
+            font-size: 1em;
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .screenshot-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .screenshot-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .screenshot-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .screenshot-card .caption {
+            padding: 15px;
+            font-size: 0.9em;
+            color: #495057;
+            background: #f8f9fa;
+        }
+
+        .defect-card {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .defect-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .defect-id {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #856404;
+        }
+
+        .severity-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            background: #dc3545;
+            color: white;
+        }
+
+        .defect-description {
+            line-height: 1.6;
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .defect-details {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal img {
+            max-width: 95%;
+            max-height: 95vh;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2em;
+            color: white;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .summary-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .summary-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .summary-section p {
+            line-height: 1.8;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .recommendation-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .recommendation-box h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .recommendation-box ul {
+            margin-left: 20px;
+            line-height: 2;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .log-viewer {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+
+        /* Inline screenshots in test case body */
+        .test-screenshots {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .test-screenshots h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .inline-screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .inline-screenshot {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .inline-screenshot:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .inline-screenshot img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .inline-screenshot .caption {
+            padding: 10px;
+            font-size: 0.85em;
+            color: #495057;
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        /* API error logs in test case body */
+        .api-error-log {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ffc107;
+        }
+
+        .api-error-log h4 {
+            color: #dc3545;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .api-error-log h4::before {
+            content: '⚠️';
+            font-size: 1.2em;
+        }
+
+        .api-log-viewer {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        .api-log-section {
+            margin-bottom: 15px;
+        }
+
+        .api-log-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .api-log-label {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 5px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert.warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .alert-icon {
+            font-size: 1.5em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .screenshot-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                padding: 0 15px;
+            }
+
+            .tab {
+                padding: 12px 15px;
+                font-size: 0.9em;
+            }
+
+            .content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Game AI Bot v1.3.0</h1>
+            <p>User Acceptance Testing (UAT) - Final Test Execution Report</p>
+            <p style="opacity: 0.8; margin-top: 10px;">Execution Date: 2025-11-12 | AWS China North 1 Region</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="number">8</div>
+                <div class="label">Total Tests</div>
+            </div>
+            <div class="stat-card passed">
+                <div class="number">4</div>
+                <div class="label">Passed</div>
+            </div>
+            <div class="stat-card failed">
+                <div class="number">0</div>
+                <div class="label">Failed</div>
+            </div>
+            <div class="stat-card blocked">
+                <div class="number">4</div>
+                <div class="label">Blocked</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('summary')">📊 Executive Summary</button>
+            <button class="tab" onclick="switchTab('passed')">✅ Passed Tests (4)</button>
+            <button class="tab" onclick="switchTab('blocked')">⚠️ Blocked Tests (4)</button>
+            <button class="tab" onclick="switchTab('defects')">🐞 Defects (1)</button>
+            <button class="tab" onclick="switchTab('screenshots')">📸 Screenshots (26)</button>
+            <button class="tab" onclick="switchTab('logs')">📝 Logs</button>
+        </div>
+
+        <div class="content">
+            <!-- Summary Tab -->
+            <div id="summary" class="tab-content active">
+                <div class="alert warning">
+                    <span class="alert-icon">⚠️</span>
+                    <strong>Status: CONDITIONAL APPROVAL</strong> - Critical defect blocks 50% of test suite. DO NOT RELEASE until DEFECT-001 is resolved.
+                </div>
+
+                <div class="summary-section">
+                    <h3>Test Execution Overview</h3>
+                    <p><strong>Total Execution Time:</strong> ~27.5 minutes (09:04:30 UTC - 09:32:00 UTC)</p>
+                    <p><strong>Test Environment:</strong> AWS Account 123456789012, Region cn-north-1, EKS Cluster ai-bot-cluster</p>
+                    <p><strong>Test User:</strong> testuser@example.com</p>
+                    <p><strong>Authentication:</strong> OIDC via Authing (successful)</p>
+                </div>
+
+                <div class="summary-section">
+                    <h3>Module Test Coverage</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Module</th>
+                                <th>Tests</th>
+                                <th>Executed</th>
+                                <th>Passed</th>
+                                <th>Blocked</th>
+                                <th>Coverage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Game Package Management</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>0</td>
+                                <td>✅ 100%</td>
+                            </tr>
+                            <tr>
+                                <td>Game Environment Management</td>
+                                <td>2</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>2</td>
+                                <td>❌ 0%</td>
+                            </tr>
+                            <tr>
+                                <td>System Settings</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>0</td>
+                                <td>✅ 100%</td>
+                            </tr>
+                            <tr>
+                                <td>Ray Cluster Management</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>0</td>
+                                <td>✅ 100%</td>
+                            </tr>
+                            <tr>
+                                <td>Model Training</td>
+                                <td>1</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>1</td>
+                                <td>❌ 0%</td>
+                            </tr>
+                            <tr>
+                                <td>Testing & Evaluation</td>
+                                <td>1</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>1</td>
+                                <td>❌ 0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="recommendation-box">
+                    <h3>🎯 Recommendations</h3>
+                    <p><strong>Immediate Actions (P1 - Urgent):</strong></p>
+                    <ul>
+                        <li>Resolve DEFECT-001: Fix EKS node group labeling (node-group=x86-ng-v2)</li>
+                        <li>Verify nodes are properly joined to cluster and ready</li>
+                        <li>Confirm backend service account has correct Kubernetes RBAC permissions</li>
+                        <li>Re-execute blocked test cases after fix</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>Short-term Improvements (P2):</strong></p>
+                    <ul>
+                        <li>Enhance error messages with detailed Kubernetes API errors</li>
+                        <li>Add pre-flight validation for node group availability</li>
+                        <li>Implement infrastructure monitoring and alerts</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Passed Tests Tab -->
+            <div id="passed" class="tab-content">
+                <div class="alert success">
+                    <span class="alert-icon">✅</span>
+                    <strong>4 tests passed successfully</strong> - Game Package Management, System Settings, and Ray Cluster modules are production-ready.
+                </div>
+
+                <div class="test-case">
+                    <div class="test-case-header" onclick="toggleTestCase(this)">
+                        <div class="test-case-title">
+                            <span class="toggle-icon"></span>
+                            <span>TC-1.1: Upload Headless Game Package</span>
+                        </div>
+                        <span class="status-badge pass">✅ PASS</span>
+                    </div>
+                    <div class="test-case-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="label">Module</div>
+                                <div class="value">Game Package Management</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Priority</div>
+                                <div class="value">P1 (High)</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Execution Time</div>
+                                <div class="value">2025-11-12 09:07 UTC</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Duration</div>
+                                <div class="value">150 seconds</div>
+                            </div>
+                        </div>
+                        <p><strong>Summary:</strong> Successfully uploaded Headless game package "Match3-Headless-Test v1.0.0" with automatic Docker image build completion.</p>
+                        <p><strong>Key Results:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 2;">
+                            <li>✅ File upload completed (33 MB)</li>
+                            <li>✅ Package created in list</li>
+                            <li>✅ Docker build automatically triggered</li>
+                            <li>✅ Build completed successfully in 53 seconds</li>
+                            <li>✅ Docker image pushed to ECR</li>
+                        </ul>
+
+                        <!-- Inline Screenshots Section -->
+                        <div class="test-screenshots">
+                            <h4>📸 Test Execution Screenshots</h4>
+                            <div class="inline-screenshot-grid">
+                                <div class="inline-screenshot" onclick="openModal('screenshots/04_game_packages_page.png')">
+                                    <img src="screenshots/04_game_packages_page.png" alt="Empty Packages">
+                                    <div class="caption">04: Empty Packages List</div>
+                                </div>
+                                <div class="inline-screenshot" onclick="openModal('screenshots/05_create_package_form.png')">
+                                    <img src="screenshots/05_create_package_form.png" alt="Create Form">
+                                    <div class="caption">05: Create Package Form</div>
+                                </div>
+                                <div class="inline-screenshot" onclick="openModal('screenshots/06_form_filled_ready_submit.png')">
+                                    <img src="screenshots/06_form_filled_ready_submit.png" alt="Form Ready">
+                                    <div class="caption">06: Form Ready to Submit</div>
+                                </div>
+                                <div class="inline-screenshot" onclick="openModal('screenshots/07_tc11_package_list_success.png')">
+                                    <img src="screenshots/07_tc11_package_list_success.png" alt="Package Created">
+                                    <div class="caption">07: Package Created</div>
+                                </div>
+                                <div class="inline-screenshot" onclick="openModal('screenshots/08_tc11_package_details.png')">
+                                    <img src="screenshots/08_tc11_package_details.png" alt="Build In Progress">
+                                    <div class="caption">08: Build IN_PROGRESS</div>
+                                </div>
+                                <div class="inline-screenshot" onclick="openModal('screenshots/09_tc11_build_succeeded.png')">
+                                    <img src="screenshots/09_tc11_build_succeeded.png" alt="Build Succeeded">
+                                    <div class="caption">09: Build SUCCEEDED</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-case">
+                    <div class="test-case-header" onclick="toggleTestCase(this)">
+                        <div class="test-case-title">
+                            <span class="toggle-icon"></span>
+                            <span>TC-1.2: Upload Headed Game Package</span>
+                        </div>
+                        <span class="status-badge pass">✅ PASS</span>
+                    </div>
+                    <div class="test-case-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="label">Module</div>
+                                <div class="value">Game Package Management</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Priority</div>
+                                <div class="value">P1 (High)</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Execution Time</div>
+                                <div class="value">2025-11-12 09:10 UTC</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Duration</div>
+                                <div class="value">120 seconds</div>
+                            </div>
+                        </div>
+                        <p><strong>Summary:</strong> Successfully uploaded Headed game package "Match3-Headed-Test v1.0.0" without Docker build (correct behavior).</p>
+                        <p><strong>Key Results:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 2;">
+                            <li>✅ File upload completed (35 MB)</li>
+                            <li>✅ Package created in list</li>
+                            <li>✅ No Docker build triggered (expected for Headed packages)</li>
+                            <li>✅ Package uploaded to S3 successfully</li>
+                            <li>✅ Both packages now available for environment creation</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Related Screenshots:</strong> 10-13</p>
+                    </div>
+                </div>
+
+                <div class="test-case">
+                    <div class="test-case-header" onclick="toggleTestCase(this)">
+                        <div class="test-case-title">
+                            <span class="toggle-icon"></span>
+                            <span>TC-6.1: Configure System Settings</span>
+                        </div>
+                        <span class="status-badge pass">✅ PASS</span>
+                    </div>
+                    <div class="test-case-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="label">Module</div>
+                                <div class="value">System Settings</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Priority</div>
+                                <div class="value">P2 (Medium)</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Execution Time</div>
+                                <div class="value">2025-11-12 09:25 UTC</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Duration</div>
+                                <div class="value">240 seconds</div>
+                            </div>
+                        </div>
+                        <p><strong>Summary:</strong> Successfully modified system configuration for Headed instance types and verified changes reflected in UI.</p>
+                        <p><strong>Test Actions:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 2;">
+                            <li>✅ Modified "Headed Instance Types" to add "g4dn.xlarge"</li>
+                            <li>✅ API update returned HTTP 200</li>
+                            <li>✅ Changes persisted in database</li>
+                            <li>✅ Verified new instance type appears in Environment creation dropdown</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Related Screenshots:</strong> 18-21</p>
+                    </div>
+                </div>
+
+                <div class="test-case">
+                    <div class="test-case-header" onclick="toggleTestCase(this)">
+                        <div class="test-case-title">
+                            <span class="toggle-icon"></span>
+                            <span>TC-4.1: Deploy Ray Cluster</span>
+                        </div>
+                        <span class="status-badge pass">✅ PASS</span>
+                    </div>
+                    <div class="test-case-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="label">Module</div>
+                                <div class="value">Ray Cluster Management</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Priority</div>
+                                <div class="value">P1 (High)</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Execution Time</div>
+                                <div class="value">2025-11-12 09:30 UTC</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Duration</div>
+                                <div class="value">180 seconds</div>
+                            </div>
+                        </div>
+                        <p><strong>Summary:</strong> Successfully deployed Ray cluster "TestRayCluster" with head node running and workers provisioning.</p>
+                        <p><strong>Cluster Details:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 2;">
+                            <li><strong>Cluster ID:</strong> 8d5b10f16c35457f97a4e2f8993bc5b5</li>
+                            <li><strong>Ray Version:</strong> 2.38.0</li>
+                            <li><strong>Head Node:</strong> g4dn.2xlarge (running) - i-0dafa662e3724d09c</li>
+                            <li><strong>Worker Nodes:</strong> 2 × c6i.2xlarge (provisioning)</li>
+                            <li><strong>Network:</strong> VPC vpc-09a28fe8e82cb4fca, 2 subnets, security group configured</li>
+                            <li><strong>Storage:</strong> Head node 1000 GB, Workers 500 GB each</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Related Screenshots:</strong> 22-26</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blocked Tests Tab -->
+            <div id="blocked" class="tab-content">
+                <div class="alert warning">
+                    <span class="alert-icon">⚠️</span>
+                    <strong>4 tests blocked by DEFECT-001</strong> - Environment creation API returns HTTP 500 error due to infrastructure issues.
+                </div>
+
+                <div class="test-case">
+                    <div class="test-case-header" onclick="toggleTestCase(this)">
+                        <div class="test-case-title">
+                            <span class="toggle-icon"></span>
+                            <span>TC-2.1: Create Headless Game Environment</span>
+                        </div>
+                        <span class="status-badge blocked">⚠️ BLOCKED</span>
+                    </div>
+                    <div class="test-case-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="label">Module</div>
+                                <div class="value">Game Environment Management</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Priority</div>
+                                <div class="value">P1 (High)</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Blocked By</div>
+                                <div class="value">DEFECT-001</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">API Error</div>
+                                <div class="value">HTTP 500 Internal Server Error</div>
+                            </div>
+                        </div>
+                        <p><strong>Test Attempted:</strong> 2025-11-12 09:22 UTC</p>
+                        <p><strong>Issue:</strong> API endpoint POST /api/create_game_env returned error message: "Error creating service"</p>
+                        <p><strong>Form Data Submitted:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 2;">
+                            <li>Environment Name: HeadlessEnv-Test</li>
+                            <li>Package Type: Headless</li>
+                            <li>Game: Match3-Headless-Test 1.0.0</li>
+                            <li>Node Group: x86-ng-v2</li>
+                            <li>Replicas: 10</li>
+                            <li>CPU: 100 millicores, Memory: 64 MiB</li>
+                        </ul>
+
+                        <!-- API Error Log Section -->
+                        <div class="api-error-log">
+                            <h4>API Error Details</h4>
+                            <div class="api-log-viewer">
+                                <div class="api-log-section">
+                                    <div class="api-log-label">REQUEST:</div>
+POST /api/create_game_env HTTP/1.1
+Host: <API_GATEWAY_ID>.execute-api.cn-north-1.amazonaws.com.cn
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci...
+
+{
+  "gameEnvName": "HeadlessEnv-Test",
+  "gameType": "Headless",
+  "gameId": "88402340a5ae440288ffdbf16f9ad343",
+  "gameName": "Match3-Headless-Test",
+  "version": "1.0.0",
+  "headlessGameEnvInfo": {
+    "imageUri": "123456789012.dkr.ecr.cn-north-1.amazonaws.com.cn/ai-bot-aibotgameecr...",
+    "nodeGroup": "x86-ng-v2",
+    "replicasNum": 10,
+    "cpu": 100,
+    "memory": 64
+  }
+}
+                                </div>
+                                <div class="api-log-section">
+                                    <div class="api-log-label">RESPONSE:</div>
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json; charset=utf-8
+Date: Tue, 12 Nov 2025 09:22:15 GMT
+
+{
+  "message": "Error creating service",
+  "timestamp": "2025-11-12T09:22:15.234Z",
+  "path": "/api/create_game_env"
+}
+                                </div>
+                                <div class="api-log-section">
+                                    <div class="api-log-label">LOG FILE:</div>
+See logs/api_error_tc21_create_environment.json for full details
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inline Screenshots Section -->
+                        <div class="test-screenshots">
+                            <h4>📸 Test Execution Screenshots</h4>
+                            <div class="inline-screenshot-grid">
+                                <div class="inline-screenshot" onclick="openModal('screenshots/14_tc21_env_list_empty.png')">
+                                    <img src="screenshots/14_tc21_env_list_empty.png" alt="Empty Env List">
+                                    <div class="caption">14: Empty Environment List</div>
+                                </div>
+                                <div class="inline-screenshot" onclick="openModal('screenshots/15_tc21_env_create_form.png')">
+                                    <img src="screenshots/15_tc21_env_create_form.png" alt="Create Env Form">
+                                    <div class="caption">15: Create Environment Form</div>
+                                </div>
+                                <div class="inline-screenshot" onclick="openModal('screenshots/16_tc21_env_form_complete.png')">
+                                    <img src="screenshots/16_tc21_env_form_complete.png" alt="Form Complete">
+                                    <div class="caption">16: Form Ready to Submit</div>
+                                </div>
+                                <div class="inline-screenshot" onclick="openModal('screenshots/17_tc21_submit_status.png')">
+                                    <img src="screenshots/17_tc21_submit_status.png" alt="Submit Failed">
+                                    <div class="caption">17: HTTP 500 Error</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-case">
+                    <div class="test-case-header" onclick="toggleTestCase(this)">
+                        <div class="test-case-title">
+                            <span class="toggle-icon"></span>
+                            <span>TC-2.2: Create Headed Game Environment</span>
+                        </div>
+                        <span class="status-badge blocked">⚠️ BLOCKED</span>
+                    </div>
+                    <div class="test-case-body">
+                        <p><strong>Status:</strong> Not attempted due to same API endpoint failure as TC-2.1.</p>
+                        <p><strong>Reason:</strong> Both Headless and Headed environment creation use the same API endpoint which is currently failing.</p>
+                    </div>
+                </div>
+
+                <div class="test-case">
+                    <div class="test-case-header" onclick="toggleTestCase(this)">
+                        <div class="test-case-title">
+                            <span class="toggle-icon"></span>
+                            <span>TC-3.1: Model Training with SageMaker</span>
+                        </div>
+                        <span class="status-badge blocked">⚠️ BLOCKED</span>
+                    </div>
+                    <div class="test-case-body">
+                        <p><strong>Status:</strong> Cannot execute because it depends on TC-2.1.</p>
+                        <p><strong>Dependency:</strong> Model training requires a running Headless game environment which cannot be created due to DEFECT-001.</p>
+                    </div>
+                </div>
+
+                <div class="test-case">
+                    <div class="test-case-header" onclick="toggleTestCase(this)">
+                        <div class="test-case-title">
+                            <span class="toggle-icon"></span>
+                            <span>TC-5.1: Comparative Testing Between Models</span>
+                        </div>
+                        <span class="status-badge blocked">⚠️ BLOCKED</span>
+                    </div>
+                    <div class="test-case-body">
+                        <p><strong>Status:</strong> Cannot execute because it depends on TC-3.1.</p>
+                        <p><strong>Dependency Chain:</strong> TC-5.1 → TC-3.1 → TC-2.1 (all blocked by DEFECT-001)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Defects Tab -->
+            <div id="defects" class="tab-content">
+                <div class="defect-card">
+                    <div class="defect-header">
+                        <div class="defect-id">DEFECT-001</div>
+                        <span class="severity-badge">S2 (Major)</span>
+                        <span class="severity-badge" style="background: #dc3545;">P1 (Urgent)</span>
+                    </div>
+                    <div class="defect-description">
+                        <strong>[Environment Creation] API returns 500 error when creating Headless game environment</strong>
+                    </div>
+                    <p><strong>Reporter:</strong> Claude Code (Automated Testing)</p>
+                    <p><strong>Date Found:</strong> 2025-11-12 09:22 UTC</p>
+                    <p><strong>Module:</strong> Game Environment Management - Environment Creation API</p>
+
+                    <div class="defect-details">
+                        <h4>Description</h4>
+                        <p>API endpoint POST /api/create_game_env returns HTTP 500 Internal Server Error when attempting to create Headless game environments. Error message: <code>{"message":"Error creating service"}</code></p>
+
+                        <h4 style="margin-top: 20px;">Root Cause (Suspected)</h4>
+                        <ol style="margin-left: 20px; line-height: 1.8;">
+                            <li><strong>Node Label Mismatch:</strong> The x86-ng-v2 node group exists and is ACTIVE, but nodes may not have the correct <code>node-group=x86-ng-v2</code> label that the pod scheduler is looking for.</li>
+                            <li><strong>Node Availability:</strong> Although the node group has desiredSize=2, the nodes might not be ready or properly joined to the cluster yet.</li>
+                            <li><strong>Service Account / RBAC Permissions:</strong> The backend service may lack sufficient Kubernetes permissions to create deployments/services in the target namespace.</li>
+                        </ol>
+
+                        <h4 style="margin-top: 20px;">Investigation Results</h4>
+                        <div class="log-viewer">
+# Check for nodes with x86-ng-v2 label
+$ kubectl get nodes -l node-group=x86-ng-v2
+No resources found
+
+# Check EKS node group status
+$ aws eks describe-nodegroup --cluster-name ai-bot-cluster --nodegroup-name x86-ng-v2
+{
+  "status": "ACTIVE",
+  "scalingConfig": {
+    "minSize": 1,
+    "maxSize": 10,
+    "desiredSize": 2
+  }
+}
+                        </div>
+
+                        <h4 style="margin-top: 20px;">Impact</h4>
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li><strong>User Impact:</strong> HIGH - Users cannot create any game environments, which is a core feature</li>
+                            <li><strong>Workflow Impact:</strong> CRITICAL - Blocks model training workflow</li>
+                            <li><strong>Test Coverage Impact:</strong> Blocks TC-2.1, TC-2.2, TC-3.1, TC-5.1 (4 out of 8 test cases = 50%)</li>
+                        </ul>
+
+                        <h4 style="margin-top: 20px;">Recommendations</h4>
+                        <ol style="margin-left: 20px; line-height: 1.8;">
+                            <li><strong>Immediate:</strong> Check backend application logs for detailed stack trace</li>
+                            <li><strong>Immediate:</strong> Verify node group labels match what the API expects</li>
+                            <li><strong>Immediate:</strong> Confirm Kubernetes service account has correct permissions</li>
+                            <li><strong>Short-term:</strong> Improve error messages to include actionable details</li>
+                            <li><strong>Short-term:</strong> Add API endpoint validation before creating Kubernetes resources</li>
+                            <li><strong>Long-term:</strong> Implement pre-flight checks in UI to validate node group availability</li>
+                        </ol>
+
+                        <p style="margin-top: 20px;"><strong>Reproduction Rate:</strong> 100% (2 out of 2 attempts failed with same error)</p>
+                        <p><strong>Full Report:</strong> <a href="defect-reports/DEFECT-001-Environment-Creation-500-Error.md" target="_blank">DEFECT-001-Environment-Creation-500-Error.md</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screenshots Tab -->
+            <div id="screenshots" class="tab-content">
+                <h3 style="margin-bottom: 20px;">Test Execution Screenshots (26 total)</h3>
+
+                <h4 style="margin: 20px 0;">Authentication & Initial Setup</h4>
+                <div class="screenshot-grid">
+                    <div class="screenshot-card" onclick="openModal('screenshots/01_portal_home.png')">
+                        <img src="screenshots/01_portal_home.png" alt="Portal Home">
+                        <div class="caption">01: Initial portal home page (login required)</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/02_after_oidc_click.png')">
+                        <img src="screenshots/02_after_oidc_click.png" alt="OIDC Page">
+                        <div class="caption">02: OIDC authentication page (Authing)</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/03_after_login_home.png')">
+                        <img src="screenshots/03_after_login_home.png" alt="After Login">
+                        <div class="caption">03: Portal after successful login</div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 30px 0 20px;">TC-1.1: Headless Package Upload ✅</h4>
+                <div class="screenshot-grid">
+                    <div class="screenshot-card" onclick="openModal('screenshots/04_game_packages_page.png')">
+                        <img src="screenshots/04_game_packages_page.png" alt="Empty Packages">
+                        <div class="caption">04: Empty Game Packages list (0–0 of 0)</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/05_create_package_form.png')">
+                        <img src="screenshots/05_create_package_form.png" alt="Create Form">
+                        <div class="caption">05: Create Headless package form</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/06_form_filled_ready_submit.png')">
+                        <img src="screenshots/06_form_filled_ready_submit.png" alt="Form Ready">
+                        <div class="caption">06: Form filled and ready to submit</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/07_tc11_package_list_success.png')">
+                        <img src="screenshots/07_tc11_package_list_success.png" alt="Package Created">
+                        <div class="caption">07: Headless package created in list (1–1 of 1)</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/08_tc11_package_details.png')">
+                        <img src="screenshots/08_tc11_package_details.png" alt="Build In Progress">
+                        <div class="caption">08: Package details - Build IN_PROGRESS</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/09_tc11_build_succeeded.png')">
+                        <img src="screenshots/09_tc11_build_succeeded.png" alt="Build Succeeded">
+                        <div class="caption">09: Package details - Build SUCCEEDED (53s)</div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 30px 0 20px;">TC-1.2: Headed Package Upload ✅</h4>
+                <div class="screenshot-grid">
+                    <div class="screenshot-card" onclick="openModal('screenshots/10_tc12_headed_form.png')">
+                        <img src="screenshots/10_tc12_headed_form.png" alt="Headed Form">
+                        <div class="caption">10: Create Headed package form</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/11_tc12_headed_ready_submit.png')">
+                        <img src="screenshots/11_tc12_headed_ready_submit.png" alt="Headed Ready">
+                        <div class="caption">11: Headed form ready to submit</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/12_tc12_both_packages_list.png')">
+                        <img src="screenshots/12_tc12_both_packages_list.png" alt="Both Packages">
+                        <div class="caption">12: Both packages in list (1–2 of 2)</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/13_tc12_headed_details_no_build.png')">
+                        <img src="screenshots/13_tc12_headed_details_no_build.png" alt="No Build">
+                        <div class="caption">13: Headed package - No build info (correct)</div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 30px 0 20px;">TC-2.1: Environment Creation ❌ (BLOCKED)</h4>
+                <div class="screenshot-grid">
+                    <div class="screenshot-card" onclick="openModal('screenshots/14_tc21_env_list_empty.png')">
+                        <img src="screenshots/14_tc21_env_list_empty.png" alt="Empty Env List">
+                        <div class="caption">14: Empty Game Environments list</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/15_tc21_env_create_form.png')">
+                        <img src="screenshots/15_tc21_env_create_form.png" alt="Create Env Form">
+                        <div class="caption">15: Environment creation form</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/16_tc21_env_form_complete.png')">
+                        <img src="screenshots/16_tc21_env_form_complete.png" alt="Form Complete">
+                        <div class="caption">16: Complete form ready for submission</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/17_tc21_submit_status.png')">
+                        <img src="screenshots/17_tc21_submit_status.png" alt="Submit Failed">
+                        <div class="caption">17: Form after failed submission (HTTP 500)</div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 30px 0 20px;">TC-6.1: System Settings ✅</h4>
+                <div class="screenshot-grid">
+                    <div class="screenshot-card" onclick="openModal('screenshots/18_tc61_system_settings_initial.png')">
+                        <img src="screenshots/18_tc61_system_settings_initial.png" alt="Settings Initial">
+                        <div class="caption">18: System Settings initial state</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/19_tc61_modified_headed_instance_types.png')">
+                        <img src="screenshots/19_tc61_modified_headed_instance_types.png" alt="Settings Modified">
+                        <div class="caption">19: Modified Headed instance types (+g4dn.xlarge)</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/20_tc61_update_success.png')">
+                        <img src="screenshots/20_tc61_update_success.png" alt="Update Success">
+                        <div class="caption">20: Settings update successful</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/21_tc61_headed_instance_types_verified.png')">
+                        <img src="screenshots/21_tc61_headed_instance_types_verified.png" alt="Instance Types Verified">
+                        <div class="caption">21: New instance type verified in dropdown</div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 30px 0 20px;">TC-4.1: Ray Cluster Deployment ✅</h4>
+                <div class="screenshot-grid">
+                    <div class="screenshot-card" onclick="openModal('screenshots/22_tc41_ray_cluster_list.png')">
+                        <img src="screenshots/22_tc41_ray_cluster_list.png" alt="Empty Cluster List">
+                        <div class="caption">22: Empty Ray Cluster list</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/23_tc41_create_form.png')">
+                        <img src="screenshots/23_tc41_create_form.png" alt="Cluster Create Form">
+                        <div class="caption">23: Ray Cluster creation form</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/24_tc41_form_complete.png')">
+                        <img src="screenshots/24_tc41_form_complete.png" alt="Cluster Form Complete">
+                        <div class="caption">24: Complete form ready to submit</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/25_tc41_cluster_created.png')">
+                        <img src="screenshots/25_tc41_cluster_created.png" alt="Cluster Created">
+                        <div class="caption">25: Cluster created (INITIALIZING status)</div>
+                    </div>
+                    <div class="screenshot-card" onclick="openModal('screenshots/26_tc41_cluster_details.png')">
+                        <img src="screenshots/26_tc41_cluster_details.png" alt="Cluster Details">
+                        <div class="caption">26: Cluster details - Head node running</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Tab -->
+            <div id="logs" class="tab-content">
+                <h3 style="margin-bottom: 20px;">Test Execution Logs</h3>
+
+                <div class="summary-section">
+                    <h4>Portal Home Page Accessibility Tree</h4>
+                    <p>Initial page snapshot captured using Chrome DevTools accessibility tree</p>
+                    <div class="log-viewer">uid=1_0 RootWebArea url="https://<API_GATEWAY_ID>.execute-api.cn-north-1.amazonaws.com.cn/auth/signin"
+  uid=1_1 main
+    uid=1_2 heading "Sign in to Game AI Bot" level="5"
+    uid=1_3 StaticText "Welcome, please sign in to continue"
+    uid=1_4 button "Sign In With OIDC"
+  uid=1_5 StaticText "/auth/signin"</div>
+                </div>
+
+                <div class="summary-section">
+                    <h4>API Request - Environment Creation (Failed)</h4>
+                    <p><strong>Endpoint:</strong> POST /api/create_game_env</p>
+                    <p><strong>Status:</strong> HTTP 500 Internal Server Error</p>
+                    <div class="log-viewer"># Request
+POST /api/create_game_env HTTP/1.1
+Host: <API_GATEWAY_ID>.execute-api.cn-north-1.amazonaws.com.cn
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGci...
+
+{
+  "gameEnvName": "HeadlessEnv-Test",
+  "gameType": "Headless",
+  "gameId": "88402340a5ae440288ffdbf16f9ad343",
+  "gameName": "Match3-Headless-Test",
+  "version": "1.0.0",
+  "gameEnvId": "",
+  "createTime": "2025-11-12T09:11:23.154Z",
+  "status": "Available",
+  "headlessGameEnvInfo": {
+    "imageUri": "123456789012.dkr.ecr.cn-north-1.amazonaws.com.cn/ai-bot-aibotgameecr61a88526-gwtg3vem2hdm:88402340a5ae440288ffdbf16f9ad343",
+    "nodeGroup": "x86-ng-v2",
+    "replicasNum": 10,
+    "cpu": 100,
+    "memory": 64,
+    "namespace": "",
+    "headlessGameEnvPodInfoList": []
+  }
+}
+
+# Response
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json; charset=utf-8
+
+{
+  "message": "Error creating service"
+}</div>
+                </div>
+
+                <div class="summary-section">
+                    <h4>Kubernetes Investigation</h4>
+                    <div class="log-viewer"># Check for nodes with x86-ng-v2 label
+$ kubectl get nodes -l node-group=x86-ng-v2
+No resources found
+
+# Check EKS node group status via AWS CLI
+$ aws eks describe-nodegroup --cluster-name ai-bot-cluster --nodegroup-name x86-ng-v2
+{
+  "nodegroup": {
+    "nodegroupName": "x86-ng-v2",
+    "status": "ACTIVE",
+    "scalingConfig": {
+      "minSize": 1,
+      "maxSize": 10,
+      "desiredSize": 2
+    },
+    "instanceTypes": ["t3.medium"],
+    "subnets": ["subnet-0d695b06bbca96178", "subnet-0f16cd113b5f39552"]
+  }
+}
+
+# Check existing deployments in namespace
+$ kubectl get deployments -n game-ai-bot
+No resources found in game-ai-bot namespace.</div>
+                </div>
+
+                <div class="summary-section">
+                    <h4>Test Execution Timeline</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time (UTC)</th>
+                                <th>Activity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>09:04:30</td>
+                                <td>Environment validation started</td>
+                                <td>✅ Pass</td>
+                            </tr>
+                            <tr>
+                                <td>09:05:00</td>
+                                <td>Portal login via OIDC</td>
+                                <td>✅ Pass</td>
+                            </tr>
+                            <tr>
+                                <td>09:06:30</td>
+                                <td>TC-1.1: Headless Package Upload started</td>
+                                <td>✅ Pass</td>
+                            </tr>
+                            <tr>
+                                <td>09:07:59</td>
+                                <td>Docker build started (CodeBuild)</td>
+                                <td>✅ Pass</td>
+                            </tr>
+                            <tr>
+                                <td>09:08:52</td>
+                                <td>Docker build completed (53 seconds)</td>
+                                <td>✅ Pass</td>
+                            </tr>
+                            <tr>
+                                <td>09:09:00</td>
+                                <td>TC-1.2: Headed Package Upload started</td>
+                                <td>✅ Pass</td>
+                            </tr>
+                            <tr>
+                                <td>09:11:00</td>
+                                <td>TC-2.1: Environment Creation started</td>
+                                <td>❌ Failed</td>
+                            </tr>
+                            <tr>
+                                <td>09:22:00</td>
+                                <td>API returned HTTP 500 error</td>
+                                <td>❌ Failed</td>
+                            </tr>
+                            <tr>
+                                <td>09:25:00</td>
+                                <td>TC-6.1: System Settings started</td>
+                                <td>✅ Pass</td>
+                            </tr>
+                            <tr>
+                                <td>09:29:00</td>
+                                <td>TC-4.1: Ray Cluster Deployment started</td>
+                                <td>✅ Pass</td>
+                            </tr>
+                            <tr>
+                                <td>09:30:05</td>
+                                <td>Ray cluster created (INITIALIZING)</td>
+                                <td>✅ Pass</td>
+                            </tr>
+                            <tr>
+                                <td>09:32:00</td>
+                                <td>Test execution completed</td>
+                                <td>⚠️ Partial</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="modal-close">&times;</span>
+        <img id="modalImage" src="" alt="Screenshot">
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function toggleTestCase(header) {
+            const testCase = header.parentElement;
+            testCase.classList.toggle('expanded');
+        }
+
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.classList.add('active');
+            modalImg.src = imageSrc;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

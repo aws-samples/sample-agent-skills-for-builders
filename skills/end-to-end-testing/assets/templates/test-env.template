@@ -1,0 +1,22 @@
+# .test.env - Test Environment Configuration Template
+#
+# Instructions: Fill in all values before starting test execution
+# This file should be kept secure and never committed to version control
+
+# AWS CLI Configuration
+AWS_PROFILE=your-aws-profile
+AWS_REGION=us-east-1
+
+# CloudFormation Stack
+STACK_NAME=your-cloudformation-stack-name
+
+# Application Portal
+PORTAL_URL=https://your-portal-url.example.com
+
+# Test User Credentials
+USER=testuser@example.com
+PASSWORD=YourSecurePassword123
+
+# Optional: Additional Environment Variables
+# API_ENDPOINT=https://api.example.com
+# DATABASE_URL=postgresql://localhost:5432/testdb
