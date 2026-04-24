@@ -79,6 +79,11 @@ def cache_key(cache_dir: str, url: str) -> str:
 
 
 def fetch_json(url: str, cache_dir: str | None = None) -> dict:
+    # Security: Only allow HTTPS URLs to prevent file:// scheme attacks
+    if not url.startswith("https://"):
+        print(f"  Error: Only HTTPS URLs are allowed: {url}", file=sys.stderr)
+        return {}
+
     if cache_dir:
         cp = cache_key(cache_dir, url)
         if os.path.exists(cp) and (time.time() - os.path.getmtime(cp)) < CACHE_TTL:
@@ -88,7 +93,7 @@ def fetch_json(url: str, cache_dir: str | None = None) -> dict:
     print(f"  Fetching {url[:120]}...", file=sys.stderr)
     req = urllib.request.Request(url, headers={"Accept": "application/json"})
     try:
-        with urllib.request.urlopen(req, timeout=180) as resp:
+        with urllib.request.urlopen(req, timeout=180) as resp:  # nosec B310 - URL scheme validated above
             data = json.loads(resp.read().decode())
     except (urllib.error.HTTPError, urllib.error.URLError) as e:
         print(f"  Error: {e}", file=sys.stderr)

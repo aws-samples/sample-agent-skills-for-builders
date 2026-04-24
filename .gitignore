@@ -30,3 +30,4 @@ build/
 *.temp
 .cache/
 repos/
+.ash/

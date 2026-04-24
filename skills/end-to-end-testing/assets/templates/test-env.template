@@ -14,8 +14,9 @@ STACK_NAME=your-cloudformation-stack-name
 PORTAL_URL=https://your-portal-url.example.com
 
 # Test User Credentials
+# WARNING: Replace placeholders with actual credentials. Never commit real credentials.
 USER=testuser@example.com
-PASSWORD=YourSecurePassword123
+PASSWORD=<YOUR_PASSWORD_HERE>
 
 # Optional: Additional Environment Variables
 # API_ENDPOINT=https://api.example.com

@@ -77,8 +77,8 @@ The **Detailed Test Case Report** guides test execution with clear, traceable, a
 | **Title/Objective** | Successfully create new user with valid, unique credentials |
 | **Priority** | P1 (High) |
 | **Pre-Conditions** | 1. User is not logged in<br>2. Registration page is accessible<br>3. Email `test001@example.com` is not already registered |
-| **Test Steps** | 1. Navigate to registration page<br>2. Enter username: `Tester001`<br>3. Enter email: `test001@example.com`<br>4. Enter password: `SecureP@ss1`<br>5. Enter confirm password: `SecureP@ss1`<br>6. Check "I agree to terms" checkbox<br>7. Click "Register" button |
-| **Test Data** | Username: `Tester001`<br>Email: `test001@example.com`<br>Password: `SecureP@ss1`<br>Confirm Password: `SecureP@ss1` |
+| **Test Steps** | 1. Navigate to registration page<br>2. Enter username: `Tester001`<br>3. Enter email: `test001@example.com`<br>4. Enter password: `<VALID_PASSWORD>`<br>5. Enter confirm password: `<VALID_PASSWORD>`<br>6. Check "I agree to terms" checkbox<br>7. Click "Register" button |
+| **Test Data** | Username: `Tester001`<br>Email: `test001@example.com`<br>Password: `<VALID_PASSWORD>`<br>Confirm Password: `<VALID_PASSWORD>` |
 | **Expected Result** | 1. System displays "Registration successful" message<br>2. Page redirects to user dashboard or login page<br>3. New user record exists in database with encrypted password<br>4. Confirmation email sent to user |
 | **Actual Result** | _(Fill during execution)_ |
 | **Status** | Not Run |
@@ -96,8 +96,8 @@ The **Detailed Test Case Report** guides test execution with clear, traceable, a
 | **Title/Objective** | Verify system prevents registration with already registered email |
 | **Priority** | P1 (High) |
 | **Pre-Conditions** | 1. User is not logged in<br>2. Registration page is accessible<br>3. Email `existing@example.com` is already registered in system |
-| **Test Steps** | 1. Navigate to registration page<br>2. Enter username: `NewUser123`<br>3. Enter email: `existing@example.com`<br>4. Enter password: `ValidP@ss1`<br>5. Enter confirm password: `ValidP@ss1`<br>6. Check "I agree to terms" checkbox<br>7. Click "Register" button |
-| **Test Data** | Username: `NewUser123`<br>Email: `existing@example.com` (already registered)<br>Password: `ValidP@ss1` |
+| **Test Steps** | 1. Navigate to registration page<br>2. Enter username: `NewUser123`<br>3. Enter email: `existing@example.com`<br>4. Enter password: `<VALID_PASSWORD>`<br>5. Enter confirm password: `<VALID_PASSWORD>`<br>6. Check "I agree to terms" checkbox<br>7. Click "Register" button |
+| **Test Data** | Username: `NewUser123`<br>Email: `existing@example.com` (already registered)<br>Password: `<VALID_PASSWORD>` |
 | **Expected Result** | 1. System displays error: "Email already registered"<br>2. Registration is blocked<br>3. User remains on registration page<br>4. No duplicate user record created |
 | **Actual Result** | _(Fill during execution)_ |
 | **Status** | Not Run |
@@ -115,8 +115,8 @@ The **Detailed Test Case Report** guides test execution with clear, traceable, a
 | **Title/Objective** | Verify password strength validation rejects weak passwords |
 | **Priority** | P2 (Medium) |
 | **Pre-Conditions** | 1. User is not logged in<br>2. Registration page is accessible<br>3. Password policy requires: 8+ chars, uppercase, lowercase, number, special char |
-| **Test Steps** | 1. Navigate to registration page<br>2. Enter username: `TestUser456`<br>3. Enter email: `weak@example.com`<br>4. Enter password: `simple` (weak password)<br>5. Enter confirm password: `simple`<br>6. Attempt to check "I agree to terms"<br>7. Observe validation feedback |
-| **Test Data** | Username: `TestUser456`<br>Email: `weak@example.com`<br>Password: `simple` (fails complexity requirements) |
+| **Test Steps** | 1. Navigate to registration page<br>2. Enter username: `TestUser456`<br>3. Enter email: `weak@example.com`<br>4. Enter password: `<WEAK_PASSWORD>` (weak password)<br>5. Enter confirm password: `<WEAK_PASSWORD>`<br>6. Attempt to check "I agree to terms"<br>7. Observe validation feedback |
+| **Test Data** | Username: `TestUser456`<br>Email: `weak@example.com`<br>Password: `<WEAK_PASSWORD>` (fails complexity requirements) |
 | **Expected Result** | 1. Password field shows validation error<br>2. Error message explains password requirements<br>3. "Register" button remains disabled or shows error<br>4. Registration is blocked |
 | **Actual Result** | _(Fill during execution)_ |
 | **Status** | Not Run |

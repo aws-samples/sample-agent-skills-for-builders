@@ -32,10 +32,13 @@ def fetch_thread(thread_id, token, base_url="https://platform.quip-amazon.com"):
     # Validate thread_id: alphanumeric only
     if not re.match(r'^[A-Za-z0-9]+$', thread_id):
         raise ValueError(f"Invalid thread ID: {thread_id}")
+    # Security: Only allow HTTPS URLs to prevent file:// scheme attacks
+    if not base_url.startswith("https://"):
+        raise ValueError(f"Only HTTPS URLs are allowed: {base_url}")
     url = f"{base_url}/1/threads/{thread_id}"
     ctx = ssl.create_default_context()
     req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"})
-    with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:
+    with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:  # nosec B310 - URL scheme validated above
         return json.loads(resp.read().decode())
 
 def download_blob(blob_id, blob_name, token, output_path):
