@@ -22,7 +22,6 @@ npx skills add <your-gitlab-username>/sample-skills-for-builders@hello-world
 
 | Skill | Description |
 |-------|-------------|
-| [hello-world](skills/hello-world/) | Template skill demonstrating the Agent Skills format |
 | [create-install-scripts](skills/create-install-scripts/) | CI/CD installation scripts for AWS CDK projects |
 | [cost-estimator](skills/cost-estimator/) | AWS cost estimation with real-time pricing |
 | [security-scan](skills/security-scan/) | Security and compliance scanning for CDK |
@@ -41,15 +40,6 @@ Additional AWS-focused skills available at [zxkane/aws-skills](https://github.co
 | [aws-cost-operations](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-cost-ops/skills/aws-cost-operations) | Cost estimation and optimization |
 | [aws-serverless-eda](https://github.com/zxkane/aws-skills/tree/main/plugins/serverless-eda/skills/aws-serverless-eda) | Serverless and event-driven architecture |
 | [aws-agentic-ai](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-agentic-ai/skills/aws-agentic-ai) | Bedrock AgentCore AI agent deployment |
-
-### hello-world
-
-A template skill demonstrating the correct skill format and structure. Use this as a starting point for creating your own skills.
-
-**Use when:**
-- Learning how to create agent skills
-- Starting a new skill from a template
-- Understanding the SKILL.md format
 
 ## Creating Your Own Skills
 
