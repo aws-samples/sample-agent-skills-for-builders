@@ -1,0 +1,61 @@
+{
+  "_comment": "Hardcoded Bedrock prices for models not yet in AWS Pricing API. Updated 2026-03-03. Source: https://aws.amazon.com/bedrock/pricing/",
+  "us-east-1": [
+    {"model": "Claude Sonnet 4.6", "provider": "Anthropic", "inferenceType": "Input tokens",                "price": 0.003,    "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.6", "provider": "Anthropic", "inferenceType": "Output tokens",               "price": 0.015,    "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.6", "provider": "Anthropic", "inferenceType": "Input tokens long context",   "price": 0.006,    "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.6", "provider": "Anthropic", "inferenceType": "Output tokens long context",  "price": 0.0225,   "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.6", "provider": "Anthropic", "inferenceType": "Input tokens batch",          "price": 0.0015,   "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.6", "provider": "Anthropic", "inferenceType": "Output tokens batch",         "price": 0.0075,   "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.6", "provider": "Anthropic", "inferenceType": "Cache write (5m)",            "price": 0.00375,  "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.6", "provider": "Anthropic", "inferenceType": "Cache write (1h)",            "price": 0.006,    "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.6", "provider": "Anthropic", "inferenceType": "Cache read",                  "price": 0.0003,   "unit": "1K tokens"},
+
+    {"model": "Claude Opus 4.6", "provider": "Anthropic", "inferenceType": "Input tokens",                  "price": 0.005,    "unit": "1K tokens"},
+    {"model": "Claude Opus 4.6", "provider": "Anthropic", "inferenceType": "Output tokens",                 "price": 0.025,    "unit": "1K tokens"},
+    {"model": "Claude Opus 4.6", "provider": "Anthropic", "inferenceType": "Input tokens long context",     "price": 0.01,     "unit": "1K tokens"},
+    {"model": "Claude Opus 4.6", "provider": "Anthropic", "inferenceType": "Output tokens long context",    "price": 0.0375,   "unit": "1K tokens"},
+    {"model": "Claude Opus 4.6", "provider": "Anthropic", "inferenceType": "Input tokens batch",            "price": 0.0025,   "unit": "1K tokens"},
+    {"model": "Claude Opus 4.6", "provider": "Anthropic", "inferenceType": "Output tokens batch",           "price": 0.0125,   "unit": "1K tokens"},
+    {"model": "Claude Opus 4.6", "provider": "Anthropic", "inferenceType": "Cache write (5m)",              "price": 0.00625,  "unit": "1K tokens"},
+    {"model": "Claude Opus 4.6", "provider": "Anthropic", "inferenceType": "Cache write (1h)",              "price": 0.01,     "unit": "1K tokens"},
+    {"model": "Claude Opus 4.6", "provider": "Anthropic", "inferenceType": "Cache read",                    "price": 0.0005,   "unit": "1K tokens"},
+
+    {"model": "Claude Opus 4.5", "provider": "Anthropic", "inferenceType": "Input tokens",                  "price": 0.005,    "unit": "1K tokens"},
+    {"model": "Claude Opus 4.5", "provider": "Anthropic", "inferenceType": "Output tokens",                 "price": 0.025,    "unit": "1K tokens"},
+    {"model": "Claude Opus 4.5", "provider": "Anthropic", "inferenceType": "Input tokens batch",            "price": 0.0025,   "unit": "1K tokens"},
+    {"model": "Claude Opus 4.5", "provider": "Anthropic", "inferenceType": "Output tokens batch",           "price": 0.0125,   "unit": "1K tokens"},
+    {"model": "Claude Opus 4.5", "provider": "Anthropic", "inferenceType": "Cache write (5m)",              "price": 0.00625,  "unit": "1K tokens"},
+    {"model": "Claude Opus 4.5", "provider": "Anthropic", "inferenceType": "Cache write (1h)",              "price": 0.01,     "unit": "1K tokens"},
+    {"model": "Claude Opus 4.5", "provider": "Anthropic", "inferenceType": "Cache read",                    "price": 0.0005,   "unit": "1K tokens"},
+
+    {"model": "Claude Haiku 4.5", "provider": "Anthropic", "inferenceType": "Input tokens",                 "price": 0.001,    "unit": "1K tokens"},
+    {"model": "Claude Haiku 4.5", "provider": "Anthropic", "inferenceType": "Output tokens",                "price": 0.005,    "unit": "1K tokens"},
+    {"model": "Claude Haiku 4.5", "provider": "Anthropic", "inferenceType": "Input tokens batch",           "price": 0.0005,   "unit": "1K tokens"},
+    {"model": "Claude Haiku 4.5", "provider": "Anthropic", "inferenceType": "Output tokens batch",          "price": 0.0025,   "unit": "1K tokens"},
+    {"model": "Claude Haiku 4.5", "provider": "Anthropic", "inferenceType": "Cache write (5m)",             "price": 0.00125,  "unit": "1K tokens"},
+    {"model": "Claude Haiku 4.5", "provider": "Anthropic", "inferenceType": "Cache write (1h)",             "price": 0.002,    "unit": "1K tokens"},
+    {"model": "Claude Haiku 4.5", "provider": "Anthropic", "inferenceType": "Cache read",                   "price": 0.0001,   "unit": "1K tokens"},
+
+    {"model": "Claude Sonnet 4.5", "provider": "Anthropic", "inferenceType": "Input tokens",                "price": 0.003,    "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.5", "provider": "Anthropic", "inferenceType": "Output tokens",               "price": 0.015,    "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.5", "provider": "Anthropic", "inferenceType": "Input tokens long context",   "price": 0.006,    "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.5", "provider": "Anthropic", "inferenceType": "Output tokens long context",  "price": 0.0225,   "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.5", "provider": "Anthropic", "inferenceType": "Input tokens batch",          "price": 0.0015,   "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.5", "provider": "Anthropic", "inferenceType": "Output tokens batch",         "price": 0.0075,   "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.5", "provider": "Anthropic", "inferenceType": "Cache write (5m)",            "price": 0.00375,  "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.5", "provider": "Anthropic", "inferenceType": "Cache write (1h)",            "price": 0.006,    "unit": "1K tokens"},
+    {"model": "Claude Sonnet 4.5", "provider": "Anthropic", "inferenceType": "Cache read",                  "price": 0.0003,   "unit": "1K tokens"},
+
+    {"model": "Titan Text Embeddings V2", "provider": "Amazon", "inferenceType": "Input tokens",            "price": 0.00002,  "unit": "1K tokens"},
+    {"model": "Titan Multimodal Embeddings G1", "provider": "Amazon", "inferenceType": "Input tokens (text)", "price": 0.00002, "unit": "1K tokens"},
+    {"model": "Titan Multimodal Embeddings G1", "provider": "Amazon", "inferenceType": "Input (image)",     "price": 0.0008,   "unit": "per image"},
+
+    {"model": "Nova Micro", "provider": "Amazon", "inferenceType": "Input tokens",                          "price": 0.000035, "unit": "1K tokens"},
+    {"model": "Nova Micro", "provider": "Amazon", "inferenceType": "Output tokens",                         "price": 0.00014,  "unit": "1K tokens"},
+    {"model": "Nova Lite", "provider": "Amazon", "inferenceType": "Input tokens",                           "price": 0.00006,  "unit": "1K tokens"},
+    {"model": "Nova Lite", "provider": "Amazon", "inferenceType": "Output tokens",                          "price": 0.00024,  "unit": "1K tokens"},
+    {"model": "Nova Pro", "provider": "Amazon", "inferenceType": "Input tokens",                            "price": 0.0008,   "unit": "1K tokens"},
+    {"model": "Nova Pro", "provider": "Amazon", "inferenceType": "Output tokens",                           "price": 0.0032,   "unit": "1K tokens"}
+  ]
+}
