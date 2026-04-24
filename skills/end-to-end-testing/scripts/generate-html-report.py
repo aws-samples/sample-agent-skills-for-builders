@@ -575,6 +575,11 @@ def main():
 
     test_dir = sys.argv[1]
 
+    # Input validation: path length limit
+    if len(test_dir) > 4096:
+        print("❌ Error: Path too long (max 4096 characters)")
+        sys.exit(1)
+
     if not os.path.exists(test_dir):
         print(f"❌ Error: Directory not found: {test_dir}")
         sys.exit(1)

@@ -13,7 +13,7 @@ def read_file(filepath):
     """Read file content, return empty string if not exists."""
     try:
         return Path(filepath).read_text(encoding='utf-8')
-    except:
+    except Exception:
         return ''
 
 def read_binary(filepath):
@@ -21,7 +21,7 @@ def read_binary(filepath):
     try:
         with open(filepath, 'rb') as f:
             return base64.b64encode(f.read()).decode('utf-8')
-    except:
+    except Exception:
         return ''
 
 def escape_html(text):
@@ -637,6 +637,11 @@ def main():
         sys.exit(1)
 
     scan_dir = sys.argv[1]
+
+    # Input validation: path length limit
+    if len(scan_dir) > 4096:
+        print('Error: Path too long (max 4096 characters)')
+        sys.exit(1)
 
     if not Path(scan_dir).exists():
         print(f'Error: Directory not found: {scan_dir}')

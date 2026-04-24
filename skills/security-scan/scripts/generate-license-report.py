@@ -267,6 +267,12 @@ def main():
         sys.exit(1)
 
     scan_dir = sys.argv[1]
+
+    # Input validation: path length limit
+    if len(scan_dir) > 4096:
+        print('Error: Path too long (max 4096 characters)')
+        sys.exit(1)
+
     license_dir = Path(scan_dir) / '04-license'
 
     # Generate report

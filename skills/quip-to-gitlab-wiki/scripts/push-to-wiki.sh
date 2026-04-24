@@ -31,6 +31,10 @@ fi
 SAFE_QUIP_URL=$(echo "$QUIP_URL" | sed 's/[^a-zA-Z0-9:/_?#.=-]//g')
 
 WORK_DIR=$(mktemp -d)
+if [[ -z "$WORK_DIR" || ! "$WORK_DIR" == /tmp/* ]]; then
+    echo "ERROR: Failed to create secure temp directory"
+    exit 1
+fi
 trap "rm -rf '$WORK_DIR'" EXIT
 
 echo "Cloning wiki repo..."
