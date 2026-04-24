@@ -37,11 +37,12 @@ Reference this skill when:
 ## Usage
 
 ```bash
-# Convert Quip document
-python scripts/quip-to-markdown.py --url "https://quip.com/xxx" --token $QUIP_TOKEN
+# Convert Quip document (token from environment)
+export QUIP_TOKEN="your_token_here"
+python scripts/quip-to-markdown.py <thread_id> <output_dir>
 
 # Push to GitLab wiki
-./scripts/push-to-wiki.sh --project mygroup/myproject
+./scripts/push-to-wiki.sh <wiki_git_url> <content_dir> <page_path> <quip_url>
 ```
 
 ## Conversion Features
