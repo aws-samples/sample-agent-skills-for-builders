@@ -30,6 +30,18 @@ npx skills add <your-gitlab-username>/sample-skills-for-builders@hello-world
 | [quip-to-gitlab-wiki](skills/quip-to-gitlab-wiki/) | Quip to GitLab Wiki migration |
 | [slidingwindow-summarization](skills/slidingwindow-summarization/) | Strands conversation manager pattern |
 
+## Related Skills
+
+Additional AWS-focused skills available at [zxkane/aws-skills](https://github.com/zxkane/aws-skills):
+
+| Skill | Description |
+|-------|-------------|
+| [aws-mcp-setup](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-common/skills/aws-mcp-setup) | AWS Documentation MCP configuration |
+| [aws-cdk-development](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-cdk/skills/aws-cdk-development) | CDK best practices with AWS CDK MCP |
+| [aws-cost-operations](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-cost-ops/skills/aws-cost-operations) | Cost estimation and optimization |
+| [aws-serverless-eda](https://github.com/zxkane/aws-skills/tree/main/plugins/serverless-eda/skills/aws-serverless-eda) | Serverless and event-driven architecture |
+| [aws-agentic-ai](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-agentic-ai/skills/aws-agentic-ai) | Bedrock AgentCore AI agent deployment |
+
 ### hello-world
 
 A template skill demonstrating the correct skill format and structure. Use this as a starting point for creating your own skills.
