@@ -5,10 +5,10 @@ HTML Test Report Generator
 Automatically generates an interactive HTML report from test artifacts in a timestamped directory.
 
 Usage:
-    python generate_html_report.py <test-reports-directory>
+    python generate-html-report.py <test-reports-directory>
 
 Example:
-    python generate_html_report.py test-reports/2025-11-13_143022
+    python generate-html-report.py test-reports/2025-11-13_143022
 
 The script will:
 1. Parse test-summary-report.md for executive summary and statistics
@@ -568,9 +568,9 @@ def generate_html_report(report: TestReport, output_path: str, template_path: st
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python generate_html_report.py <test-reports-directory>")
+        print("Usage: python generate-html-report.py <test-reports-directory>")
         print("\nExample:")
-        print("  python generate_html_report.py test-reports/2025-11-13_143022")
+        print("  python generate-html-report.py test-reports/2025-11-13_143022")
         sys.exit(1)
 
     test_dir = sys.argv[1]

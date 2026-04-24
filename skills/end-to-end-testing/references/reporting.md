@@ -268,7 +268,7 @@ To enable automatic linking of screenshots and API logs to test cases:
 Use the provided Python script to automatically generate the HTML report:
 
 ```bash
-python skills/end-to-end-testing/scripts/generate_html_report.py test-reports/YYYY-MM-DD_HHMMSS
+python skills/end-to-end-testing/scripts/generate-html-report.py test-reports/YYYY-MM-DD_HHMMSS
 ```
 
 The script will:

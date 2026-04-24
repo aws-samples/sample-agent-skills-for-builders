@@ -524,7 +524,7 @@ Once all validation checks pass:
 
 1. ✅ Mark validation phase as complete
 2. ✅ Proceed to Phase 4 (Evaluation & Reporting)
-3. ✅ Generate test summary report using `references/evaluation.md`
-4. ✅ Generate interactive HTML report using `scripts/generate_html_report.py`
+3. ✅ Generate test summary report using `references/reporting.md`
+4. ✅ Generate interactive HTML report using `scripts/generate-html-report.py`
 
 **Remember**: The quality of your reports depends on the completeness and accuracy of your test data. Taking time to validate now saves debugging time later.

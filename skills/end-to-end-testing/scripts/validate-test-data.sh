@@ -255,8 +255,8 @@ if [ "$FAIL_COUNT" -eq 0 ] && [ "$WARN_COUNT" -eq 0 ]; then
     echo "You can now proceed to Phase 4 (Evaluation & Reporting)."
     echo ""
     echo "Next steps:"
-    echo "1. Generate test summary report (references/evaluation.md)"
-    echo "2. Run: python skills/end-to-end-testing/scripts/generate_html_report.py \"$TEST_DIR\""
+    echo "1. Generate test summary report (references/reporting.md)"
+    echo "2. Run: python skills/end-to-end-testing/scripts/generate-html-report.py \"$TEST_DIR\""
     exit 0
 elif [ "$FAIL_COUNT" -eq 0 ]; then
     echo -e "${YELLOW}⚠️ VALIDATION PASSED WITH WARNINGS${NC}"
@@ -266,8 +266,8 @@ elif [ "$FAIL_COUNT" -eq 0 ]; then
     echo ""
     echo "Next steps:"
     echo "1. Review warnings and fix if needed"
-    echo "2. Generate test summary report (references/evaluation.md)"
-    echo "3. Run: python skills/end-to-end-testing/scripts/generate_html_report.py \"$TEST_DIR\""
+    echo "2. Generate test summary report (references/reporting.md)"
+    echo "3. Run: python skills/end-to-end-testing/scripts/generate-html-report.py \"$TEST_DIR\""
     exit 0
 else
     echo -e "${RED}❌ VALIDATION FAILED${NC}"
