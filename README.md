@@ -20,6 +20,16 @@ npx skills add <your-gitlab-username>/sample-skills-for-builders@hello-world
 
 ## Available Skills
 
+| Skill | Description |
+|-------|-------------|
+| [hello-world](skills/hello-world/) | Template skill demonstrating the Agent Skills format |
+| [create-install-scripts](skills/create-install-scripts/) | CI/CD installation scripts for AWS CDK projects |
+| [cost-estimator](skills/cost-estimator/) | AWS cost estimation with real-time pricing |
+| [security-scan](skills/security-scan/) | Security and compliance scanning for CDK |
+| [end-to-end-testing](skills/end-to-end-testing/) | Systematic E2E testing workflow |
+| [quip-to-gitlab-wiki](skills/quip-to-gitlab-wiki/) | Quip to GitLab Wiki migration |
+| [slidingwindow-summarization](skills/slidingwindow-summarization/) | Strands conversation manager pattern |
+
 ### hello-world
 
 A template skill demonstrating the correct skill format and structure. Use this as a starting point for creating your own skills.
