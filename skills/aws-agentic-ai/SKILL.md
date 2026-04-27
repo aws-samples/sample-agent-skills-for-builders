@@ -29,8 +29,6 @@ hooks:
 
 # AWS Bedrock AgentCore
 
-> Adapted from [zxkane/aws-skills](https://github.com/zxkane/aws-skills) (MIT License, © 2025 Mengxin Zhu). See [LICENSE.upstream](./LICENSE.upstream).
-
 AWS Bedrock AgentCore provides a complete platform for deploying and scaling AI agents with nine core services. This skill covers service selection, deployment patterns, and integration workflows using AWS CLI.
 
 **How to use this skill**: Identify the service(s) the user needs from the table below, then read the corresponding service README before responding. For cross-service patterns (credentials, security, registry integration), check the Cross-Service Resources section. Verify AWS-specific details using the MCP documentation tools.

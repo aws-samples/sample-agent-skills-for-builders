@@ -22,8 +22,6 @@ hooks:
 
 # AWS CDK Development
 
-> Adapted from [zxkane/aws-skills](https://github.com/zxkane/aws-skills) (MIT License, © 2025 Mengxin Zhu). See [LICENSE.upstream](./LICENSE.upstream).
-
 This skill provides comprehensive guidance for developing AWS infrastructure using the Cloud Development Kit (CDK), with integrated MCP servers for accessing latest AWS knowledge and CDK utilities.
 
 ## AWS Documentation Requirement

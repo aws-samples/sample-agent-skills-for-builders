@@ -25,8 +25,6 @@ hooks:
 
 # AWS Cost & Operations
 
-> Adapted from [zxkane/aws-skills](https://github.com/zxkane/aws-skills) (MIT License, © 2025 Mengxin Zhu). See [LICENSE.upstream](./LICENSE.upstream).
-
 This skill provides comprehensive guidance for AWS cost optimization, monitoring, observability, and operational excellence with integrated MCP servers.
 
 ## AWS Documentation Requirement

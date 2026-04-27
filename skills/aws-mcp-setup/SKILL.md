@@ -11,8 +11,6 @@ allowed-tools:
 
 # AWS MCP Server Configuration Guide
 
-> Adapted from [zxkane/aws-skills](https://github.com/zxkane/aws-skills) (MIT License, © 2025 Mengxin Zhu). See [LICENSE.upstream](./LICENSE.upstream).
-
 ## Overview
 
 This guide helps you configure AWS MCP tools for AI agents. Two options are available:
