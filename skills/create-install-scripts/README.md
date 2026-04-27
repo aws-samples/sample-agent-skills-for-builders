@@ -6,8 +6,10 @@ Automate the generation of deployment infrastructure for AWS CDK projects. This 
 
 ### Installation
 
+Copy this skill directory into your agent's skills folder (e.g., `~/.claude/skills/` for Claude Code):
+
 ```bash
-npx skills add create-install-scripts
+cp -r skills/create-install-scripts ~/.claude/skills/
 ```
 
 ### First Use

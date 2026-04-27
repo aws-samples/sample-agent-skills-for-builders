@@ -6,10 +6,10 @@ Analyze and estimate AWS infrastructure costs for CDK projects using real-time p
 
 ### Installation
 
-Add this skill to your Claude Code environment:
+Copy this skill directory into your agent's skills folder (e.g., `~/.claude/skills/` for Claude Code):
 
 ```bash
-npx skills add https://github.com/your-org/sample-skills-for-builders/skills/cost-estimator
+cp -r skills/cost-estimator ~/.claude/skills/
 ```
 
 ### Basic Usage

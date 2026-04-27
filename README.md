@@ -1,22 +1,29 @@
 # Sample Agent Skills for Builders
 
-A collection of sample skills demonstrating how to build and publish agent skills for the [skills.sh](https://skills.sh/) ecosystem.
+A collection of sample skills demonstrating how to build and publish agent skills for AI coding agents.
 
 Skills are modular packages that extend AI coding agent capabilities with specialized knowledge, workflows, and tools.
 
 ## Installation
 
-Install all skills from this repository:
+Each skill is a self-contained directory under `skills/`. To use a skill with your AI coding agent
+(Claude Code, Cursor, Copilot, etc.), copy the skill directory into your agent's skills folder.
+
+Clone and copy a specific skill:
 
 ```bash
-npx skills add aws-samples/sample-agent-skills-for-builders
+git clone https://github.com/aws-samples/sample-agent-skills-for-builders.git
+cp -r sample-agent-skills-for-builders/skills/security-scan ~/.claude/skills/
 ```
 
-Install a specific skill:
+Or copy all skills at once:
 
 ```bash
-npx skills add aws-samples/sample-agent-skills-for-builders@security-scan
+cp -r sample-agent-skills-for-builders/skills/* ~/.claude/skills/
 ```
+
+Refer to your agent's documentation for the correct skills directory (e.g., `~/.claude/skills/` for
+Claude Code). Most agents discover skills automatically on session start.
 
 ## Available Skills
 

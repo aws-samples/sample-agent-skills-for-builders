@@ -4,10 +4,10 @@ A comprehensive security and compliance scanning solution for AWS CDK projects, 
 
 ## Installation
 
-Add this skill to your Claude Code environment:
+Copy this skill directory into your agent's skills folder (e.g., `~/.claude/skills/` for Claude Code):
 
 ```bash
-npx skills add security-scan
+cp -r skills/security-scan ~/.claude/skills/
 ```
 
 ## Quick Start

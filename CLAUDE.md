@@ -4,7 +4,7 @@ Instructions for Claude Code when working with this repository.
 
 ## Project Overview
 
-This is a sample skills repository demonstrating the Agent Skills format for the skills.sh ecosystem. Use this as a reference when helping users create new skills.
+This is a sample skills repository demonstrating the Agent Skills format for AI coding agents. Use this as a reference when helping users create new skills.
 
 ## Key Commands
 

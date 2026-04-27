@@ -4,8 +4,10 @@ Effortlessly migrate Quip documents to GitLab Wiki while preserving all content,
 
 ## Installation
 
+Copy this skill directory into your agent's skills folder (e.g., `~/.claude/skills/` for Claude Code):
+
 ```bash
-npx skills add quip-to-gitlab-wiki
+cp -r skills/quip-to-gitlab-wiki ~/.claude/skills/
 ```
 
 ## Quick Start
