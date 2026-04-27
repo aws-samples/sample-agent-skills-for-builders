@@ -1,6 +1,6 @@
 ---
 name: security-scan
-description: Comprehensive security and compliance scanning for AWS CDK projects. Use when running security audits, checking license compliance, scanning container vulnerabilities, or verifying AWS best practices before deployment.
+description: Comprehensive security and compliance scanning for AWS CDK projects. Use when running security audits, checking license compliance, scanning container vulnerabilities, or running aggregated SAST/IaC/secret analysis before deployment.
 license: MIT
 metadata:
   author: sample-skills-for-builders
@@ -17,7 +17,7 @@ Reference this skill when:
 - Running security audits on CDK projects
 - Checking license compliance
 - Scanning container images for vulnerabilities
-- Verifying AWS best practices
+- Running aggregated SAST/IaC/secret analysis (via ASH)
 - Generating security reports for review
 
 ## Scan Workflow
@@ -29,7 +29,7 @@ Reference this skill when:
 3. **Viperlight Scan** - Code security analysis
 4. **License Check** - Dependency license compliance
 5. **Trivy Scan** - Container vulnerability scanning
-6. **ASH Scan** - AWS Security Hub best practices
+6. **ASH Scan** - Automated Security Helper (aggregated SAST/IaC/secret scanners)
 7. **Deployment Verification** - Validate deployment readiness
 8. **Summary Report** - Generate findings summary
 9. **HTML Report** - Create visual report
@@ -39,7 +39,8 @@ Reference this skill when:
 - AWS CDK project
 - Viperlight CLI installed
 - Trivy CLI installed
-- ASH (AWS Security Hub) CLI
+- ASH (Automated Security Helper) - installed via `uvx` from https://github.com/awslabs/automated-security-helper
+- Docker (required for ASH container mode)
 
 ## Usage
 

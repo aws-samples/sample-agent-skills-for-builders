@@ -1,4 +1,4 @@
-# Agent Skill: Building a Sliding Window with Summarization Conversation Manager
+# Agent Skill: Building a Strands Context Manager (Sliding Window with Summarization)
 
 ## Overview
 
@@ -738,7 +738,7 @@ messages[split_point]  # TypeError: list indices must be integers or slices, not
 #### Real-World Error Example
 
 ```python
-# File: conversation_managers/slidingwindow_summarization_manager.py, line 373
+# File: conversation_managers/strands_context_manager.py, line 373
 def _adjust_split_point_for_tool_pairs(self, messages, split_point):
     while split_point < len(messages):
         # ❌ CRASH: If split_point is Decimal from config
@@ -934,7 +934,7 @@ def load_agent_config(agent_id: str) -> dict:
 - [Strands Agent SDK Documentation](https://strands.dev/docs)
 - [Strands Conversation Managers](https://strands.dev/docs/conversation-managers)
 - [Claude Agent Skills Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
-- [Implementation Example](./sliding_window_with_summarization_manager.py)
+- [Implementation Example](../scripts/strands-context-manager.py)
 - [Session Pollution Analysis](./SESSION_POLLUTION_FIX.md)
 
 ---

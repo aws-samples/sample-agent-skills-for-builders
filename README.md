@@ -27,7 +27,7 @@ npx skills add <your-gitlab-username>/sample-skills-for-builders@hello-world
 | [security-scan](skills/security-scan/) | Security and compliance scanning for CDK |
 | [end-to-end-testing](skills/end-to-end-testing/) | Systematic E2E testing workflow |
 | [quip-to-gitlab-wiki](skills/quip-to-gitlab-wiki/) | Quip to GitLab Wiki migration |
-| [slidingwindow-summarization](skills/slidingwindow-summarization/) | Strands conversation manager pattern |
+| [strands-context-manager](skills/strands-context-manager/) | Strands conversation manager pattern |
 
 ## Related Skills
 

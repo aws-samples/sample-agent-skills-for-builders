@@ -1,13 +1,13 @@
 ---
-name: slidingwindow-summarization
-description: Implement Strands conversation manager with sliding window and summarization. Use when building agents with context management, preventing session pollution, or implementing conversation compaction.
+name: strands-context-manager
+description: Strands conversation/context manager patterns, including sliding window with summarization. Use when building agents with context management, preventing session pollution, or implementing conversation compaction.
 license: MIT
 metadata:
   author: sample-skills-for-builders
   version: "1.0.0"
 ---
 
-# Sliding Window with Summarization
+# Strands Context Manager (Sliding Window with Summarization)
 
 Strands Agents SDK conversation manager combining sliding window and summarization strategies.
 
@@ -34,15 +34,14 @@ Lambda closures capture session_manager references during initialization. Create
 ## Implementation Pattern
 
 ```python
-class SlidingWindowSummarizationManager(ConversationManager):
-    def __init__(self, ...):
+class SlidingWindowWithSummarizationManager(ConversationManager):
+    def __init__(self, window_size=40, summarization_agent=None, summarization_system_prompt=None):
         self._is_summarizing = False
-        self._summarization_agent = None  # Lazy init
-    
+        self._summarization_agent = summarization_agent  # Lazy init when None
+
     def _get_summarization_agent(self):
         # Create clean agent without session_manager
         return Agent(
-            model=self.summarization_model,
             # NO session_manager, NO hooks
         )
 ```
@@ -50,12 +49,10 @@ class SlidingWindowSummarizationManager(ConversationManager):
 ## Usage
 
 ```python
-from conversation_manager import SlidingWindowSummarizationManager
+from conversation_manager import SlidingWindowWithSummarizationManager
 
-manager = SlidingWindowSummarizationManager(
-    max_messages=20,
-    summarization_model="claude-3-haiku",
-    session_manager=FileSessionManager()
+manager = SlidingWindowWithSummarizationManager(
+    window_size=20,
 )
 ```
 

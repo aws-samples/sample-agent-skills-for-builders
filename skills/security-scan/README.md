@@ -1,6 +1,6 @@
 # Security Scan Skill
 
-A comprehensive security and compliance scanning solution for AWS CDK projects, providing multi-tool analysis including code security, license compliance, container vulnerability scanning, and AWS best practices verification.
+A comprehensive security and compliance scanning solution for AWS CDK projects, providing multi-tool analysis including code security, license compliance, container vulnerability scanning, and aggregated SAST/IaC/secret analysis.
 
 ## Installation
 
@@ -23,8 +23,8 @@ Trigger the skill with natural language prompts:
 "Generate security compliance report"
 "Verify license compliance for all dependencies"
 
-# Best practices
-"Scan for AWS best practices violations"
+# Aggregated SAST/IaC/secret scanning
+"Run ASH aggregated security scan"
 ```
 
 ## Prerequisites
@@ -42,10 +42,7 @@ Before using this skill, ensure you have the following installed:
   # or
   apt-get install trivy  # Linux
   ```
-- **ASH (AWS Security Hub)** - AWS best practices validator
-  ```bash
-  npm install -g @aws/ash-cli
-  ```
+- **ASH (Automated Security Helper)** - Aggregated security scanner from AWS Labs ([awslabs/automated-security-helper](https://github.com/awslabs/automated-security-helper)) that bundles bandit, checkov, semgrep, grype, and other tools. Requires Python 3.10+, Docker (running), and `uv`. See [references/ash-scan.md](./references/ash-scan.md) for the pinned install command.
 
 ## What the Skill Does
 
@@ -56,7 +53,7 @@ The security-scan skill executes a 9-step comprehensive security workflow:
 3. **Viperlight Scan** - Detects code security issues
 4. **License Check** - Verifies dependency license compliance
 5. **Trivy Scan** - Scans container images for vulnerabilities
-6. **ASH Scan** - Checks AWS best practices compliance
+6. **ASH Scan** - Runs Automated Security Helper (aggregates SAST, IaC, and secret scanners)
 7. **Deployment Verification** - Validates deployment readiness
 8. **Summary Report** - Creates a findings summary
 9. **HTML Report** - Generates a visual HTML report
@@ -137,7 +134,7 @@ Consult the reference files for detailed information on each scanning tool and s
 - **Comprehensive reports** - HTML visual reports with findings
 - **License compliance** - Ensures all dependencies meet licensing requirements
 - **Container security** - Scans images for known vulnerabilities
-- **AWS best practices** - Validates against AWS Security Hub standards
+- **Aggregated security scanning** - ASH consolidates findings from multiple SAST/IaC/secret scanners
 - **Non-blocking failures** - Pipeline continues even if individual scans fail
 
 ## Interpreting Results
@@ -145,7 +142,7 @@ Consult the reference files for detailed information on each scanning tool and s
 Check the generated `security-report.html` for a visual overview of:
 - **High priority vulnerabilities** - Require immediate attention
 - **License violations** - Dependencies with non-compliant licenses
-- **Best practice gaps** - AWS configuration recommendations
+- **SAST / IaC / secret findings** - From ASH-aggregated scanners (bandit, checkov, semgrep, grype, etc.)
 - **Deployment blockers** - Issues preventing safe deployment
 
 Review the JSON reports in `clean-results/` for programmatic access to findings.

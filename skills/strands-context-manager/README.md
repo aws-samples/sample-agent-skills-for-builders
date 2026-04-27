@@ -1,4 +1,4 @@
-# Sliding Window with Summarization Skill
+# Strands Context Manager Skill (Sliding Window with Summarization)
 
 A production-ready conversation management solution for Strands agents that prevents context window overflow while preserving important conversation context through intelligent summarization.
 
@@ -7,7 +7,7 @@ A production-ready conversation management solution for Strands agents that prev
 ### Installation
 
 ```bash
-npx skills add slidingwindow-summarization
+npx skills add strands-context-manager
 ```
 
 ### Basic Usage
@@ -117,11 +117,11 @@ manager = SlidingWindowWithSummarizationManager(
 ## File Structure
 
 ```
-skills/slidingwindow-summarization/
+skills/strands-context-manager/
 ├── README.md                           # This file
 ├── SKILL.md                            # Skill definition & pitfall guide
 ├── scripts/
-│   └── slidingwindow-summarization-manager.py  # Implementation
+│   └── strands-context-manager.py      # Implementation
 └── references/
     └── architecture.md                 # Deep dive: design patterns & testing
 ```
