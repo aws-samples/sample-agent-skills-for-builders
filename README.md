@@ -1,4 +1,4 @@
-# Sample Skills for Builders
+# Sample Agent Skills for Builders
 
 A collection of sample skills demonstrating how to build and publish agent skills for the [skills.sh](https://skills.sh/) ecosystem.
 
@@ -9,13 +9,13 @@ Skills are modular packages that extend AI coding agent capabilities with specia
 Install all skills from this repository:
 
 ```bash
-npx skills add <your-gitlab-username>/sample-skills-for-builders
+npx skills add aws-samples/sample-agent-skills-for-builders
 ```
 
 Install a specific skill:
 
 ```bash
-npx skills add <your-gitlab-username>/sample-skills-for-builders@hello-world
+npx skills add aws-samples/sample-agent-skills-for-builders@security-scan
 ```
 
 ## Available Skills
@@ -108,11 +108,26 @@ metadata:                     # Optional: extended metadata
 
 ## Contributing
 
+Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to
+contribute a new skill or improve an existing one.
+
+Short version:
+
 1. Fork this repository
-2. Create your skill in the `skills/` directory
-3. Follow the format demonstrated in `skills/hello-world/`
-4. Submit a merge request
+2. Create your skill in the `skills/` directory (see any existing skill as a reference)
+3. Follow the format documented in [AGENTS.md](./AGENTS.md)
+4. Submit a pull request
+
+## Security
+
+See [CONTRIBUTING](./CONTRIBUTING.md#security-issue-notifications) for information about reporting
+security issues.
+
+## Code of Conduct
+
+This project has adopted the [Amazon Open Source Code of Conduct](https://aws.github.io/code-of-conduct).
+See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) for details.
 
 ## License
 
-MIT
+This library is licensed under the Apache-2.0 License. See the [LICENSE](./LICENSE) file.

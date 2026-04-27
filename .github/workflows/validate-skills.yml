@@ -1,0 +1,68 @@
+name: Validate Skills
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - '.github/workflows/validate-skills.yml'
+  pull_request:
+    paths:
+      - 'skills/**'
+      - '.github/workflows/validate-skills.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate skill structure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check each skill has SKILL.md
+        run: |
+          set -e
+          for skill_dir in skills/*/; do
+            if [ -d "$skill_dir" ]; then
+              skill_name=$(basename "$skill_dir")
+              if [ ! -f "${skill_dir}SKILL.md" ]; then
+                echo "ERROR: Missing SKILL.md in $skill_dir"
+                exit 1
+              fi
+              echo "OK: $skill_name has SKILL.md"
+            fi
+          done
+
+      - name: Validate frontmatter exists
+        run: |
+          set -e
+          for skill_md in skills/*/SKILL.md; do
+            if [ -f "$skill_md" ]; then
+              if ! head -1 "$skill_md" | grep -q '^---$'; then
+                echo "ERROR: Missing frontmatter in $skill_md"
+                exit 1
+              fi
+              echo "OK: $skill_md has frontmatter"
+            fi
+          done
+
+      - name: Check required frontmatter fields
+        run: |
+          set -e
+          for skill_md in skills/*/SKILL.md; do
+            if [ -f "$skill_md" ]; then
+              if ! grep -q '^name:' "$skill_md"; then
+                echo "ERROR: Missing 'name' field in $skill_md"
+                exit 1
+              fi
+              if ! grep -q '^description:' "$skill_md"; then
+                echo "ERROR: Missing 'description' field in $skill_md"
+                exit 1
+              fi
+              echo "OK: $skill_md has required fields"
+            fi
+          done
+
+      - name: All skills validated
+        run: echo "All skills validated successfully!"
