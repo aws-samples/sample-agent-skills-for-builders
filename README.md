@@ -1,8 +1,8 @@
 # Sample Agent Skills for Builders
 
-A collection of sample skills demonstrating how to build and publish agent skills for AI coding agents.
+A curated collection of ready-to-use agent skills covering AWS development, security scanning, testing, and AI coding workflows. Skills are self-contained capability packs that extend AI coding agents (Claude Code, Cursor, Copilot, etc.) with specialized knowledge, reference material, and automation scripts — drop a skill directory into your agent's skills folder and it's live.
 
-Skills are modular packages that extend AI coding agent capabilities with specialized knowledge, workflows, and tools.
+This repository also serves as a reference for builders authoring their own skills.
 
 ## Installation
 
