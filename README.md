@@ -8,10 +8,10 @@
 
 Skills are self-contained capability packs. An agent loads only the skill name and one-line description at startup and pulls the full instructions, references, and scripts on demand — so you can ship dozens of capabilities without eating the context window.
 
-This repository is both:
+This repository is both a ready-to-use library and a reference implementation:
 
-- **a ready-to-use library** — install any skill with a single `npx` command; and
-- **a reference implementation** — copy the format when authoring your own.
+- **Library** — install any skill with a single `npx` command.
+- **Reference** — copy the format when authoring your own.
 
 ---
 
@@ -107,7 +107,7 @@ skills/my-skill/
 
 Rules of thumb:
 
-- **Kebab-case** directory names that match the `name` field in frontmatter.
+- **Use kebab-case** for directory names, matching the `name` field in frontmatter.
 - **Keep `SKILL.md` under ~500 lines** — push long content into `references/` so it only loads when the agent decides to use it.
 - **Write the `description` as trigger phrases** — it is the only text an agent sees at startup when deciding whether to pull the skill.
 

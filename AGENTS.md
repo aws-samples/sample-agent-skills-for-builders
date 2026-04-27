@@ -77,7 +77,7 @@ Reference this skill when:
 
 ### Best Practices for Context Efficiency
 
-Skills are loaded on-demand. Only the skill name and description are loaded at startup. The full SKILL.md loads into context only when the agent decides the skill is relevant.
+Skills are loaded on demand. Only the skill name and description are loaded at startup. The full SKILL.md loads into context only when the agent decides the skill is relevant.
 
 To minimize context usage:
 
