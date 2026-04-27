@@ -38,10 +38,6 @@ browse all skills at `skills.sh/aws-samples/sample-agent-skills-for-builders`.
 | [aws-cost-operations](skills/aws-cost-operations/) | Cost estimation and operational excellence |
 | [aws-agentic-ai](skills/aws-agentic-ai/) | Bedrock AgentCore AI agent deployment |
 
-The last four skills are adapted from [zxkane/aws-skills](https://github.com/zxkane/aws-skills)
-(MIT License, © 2025 Mengxin Zhu). See each skill's `LICENSE.upstream` file and the
-[NOTICE](./NOTICE) file for attribution.
-
 ## Creating Your Own Skills
 
 See [AGENTS.md](./AGENTS.md) for detailed instructions on creating new skills.
