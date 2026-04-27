@@ -45,7 +45,6 @@ Additional AWS-focused skills available at [zxkane/aws-skills](https://github.co
 | [aws-mcp-setup](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-common/skills/aws-mcp-setup) | AWS Documentation MCP configuration |
 | [aws-cdk-development](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-cdk/skills/aws-cdk-development) | CDK best practices with AWS CDK MCP |
 | [aws-cost-operations](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-cost-ops/skills/aws-cost-operations) | Cost estimation and optimization |
-| [aws-serverless-eda](https://github.com/zxkane/aws-skills/tree/main/plugins/serverless-eda/skills/aws-serverless-eda) | Serverless and event-driven architecture |
 | [aws-agentic-ai](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-agentic-ai/skills/aws-agentic-ai) | Bedrock AgentCore AI agent deployment |
 
 ## Creating Your Own Skills
