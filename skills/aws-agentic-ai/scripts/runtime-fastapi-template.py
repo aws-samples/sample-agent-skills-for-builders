@@ -129,9 +129,9 @@ async def invocations(request: ChatRequest):
                     if text:
                         yield f"data: {json.dumps({'type': 'text-delta', 'delta': text})}\n\n"
             yield f"data: {json.dumps({'type': 'finish', 'session_id': request.id})}\n\n"
-        except Exception as e:
+        except Exception:
             logger.exception(f"Streaming error for session {request.id}")
-            yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
+            yield f"data: {json.dumps({'type': 'error', 'message': 'Internal server error'})}\n\n"
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")

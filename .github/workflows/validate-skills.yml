@@ -12,6 +12,9 @@ on:
       - '.github/workflows/validate-skills.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     name: Validate skill structure
