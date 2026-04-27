@@ -4,7 +4,7 @@ This file provides guidance to AI coding agents (Claude Code, Cursor, Copilot, e
 
 ## Repository Overview
 
-A collection of sample skills for AI coding agents. Skills are packaged instructions and scripts that extend agent capabilities. This repository follows the Agent Skills format (a `SKILL.md` file with YAML frontmatter, optionally accompanied by `references/` and `scripts/`).
+A collection of sample skills for AI coding agents. Skills are packaged instructions and scripts that extend agent capabilities. This repository follows the [Agent Skills](https://skills.sh/) format.
 
 ## Creating a New Skill
 

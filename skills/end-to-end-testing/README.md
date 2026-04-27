@@ -4,6 +4,12 @@
 
 The End-to-End Testing skill provides a systematic workflow for running comprehensive integration and E2E tests with built-in evidence capture and professional reporting. It guides you through test preparation, planning, execution, validation, and report generation with an organized output structure.
 
+## Installation
+
+```bash
+npx skills add https://github.com/aws-samples/sample-agent-skills-for-builders --skill end-to-end-testing
+```
+
 ## When to Use
 
 Reference this skill when:

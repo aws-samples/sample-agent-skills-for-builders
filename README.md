@@ -6,24 +6,22 @@ This repository also serves as a reference for builders authoring their own skil
 
 ## Installation
 
-Each skill is a self-contained directory under `skills/`. To use a skill with your AI coding agent
-(Claude Code, Cursor, Copilot, etc.), copy the skill directory into your agent's skills folder.
+Install skills from this repository using [`skills.sh`](https://skills.sh/) via `npx`.
 
-Clone and copy a specific skill:
-
-```bash
-git clone https://github.com/aws-samples/sample-agent-skills-for-builders.git
-cp -r sample-agent-skills-for-builders/skills/security-scan ~/.claude/skills/
-```
-
-Or copy all skills at once:
+Install all skills from the repository:
 
 ```bash
-cp -r sample-agent-skills-for-builders/skills/* ~/.claude/skills/
+npx skills add https://github.com/aws-samples/sample-agent-skills-for-builders
 ```
 
-Refer to your agent's documentation for the correct skills directory (e.g., `~/.claude/skills/` for
-Claude Code). Most agents discover skills automatically on session start.
+Install a specific skill by name:
+
+```bash
+npx skills add https://github.com/aws-samples/sample-agent-skills-for-builders --skill security-scan
+```
+
+Once this repository is registered on [skills.sh](https://skills.sh/), you will also be able to
+browse all skills at `skills.sh/aws-samples/sample-agent-skills-for-builders`.
 
 ## Available Skills
 

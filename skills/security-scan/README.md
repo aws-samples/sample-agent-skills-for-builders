@@ -4,10 +4,8 @@ A comprehensive security and compliance scanning solution for AWS CDK projects, 
 
 ## Installation
 
-Copy this skill directory into your agent's skills folder (e.g., `~/.claude/skills/` for Claude Code):
-
 ```bash
-cp -r skills/security-scan ~/.claude/skills/
+npx skills add https://github.com/aws-samples/sample-agent-skills-for-builders --skill security-scan
 ```
 
 ## Quick Start

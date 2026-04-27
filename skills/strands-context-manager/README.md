@@ -6,10 +6,8 @@ A production-ready conversation management solution for Strands agents that prev
 
 ### Installation
 
-Copy this skill directory into your agent's skills folder (e.g., `~/.claude/skills/` for Claude Code):
-
 ```bash
-cp -r skills/strands-context-manager ~/.claude/skills/
+npx skills add https://github.com/aws-samples/sample-agent-skills-for-builders --skill strands-context-manager
 ```
 
 ### Basic Usage
