@@ -20,7 +20,7 @@ Reference this skill when:
 - Running aggregated SAST/IaC/secret analysis (via ASH)
 - Generating security reports for review
 
-## Scan Workflow
+## How It Works
 
 **IMPORTANT: All 9 steps are mandatory. Do not skip steps regardless of time constraints.**
 

@@ -19,7 +19,7 @@ Reference this skill when:
 - Preserving embedded images and videos
 - Setting up GitLab wiki structure
 
-## Workflow
+## How It Works
 
 1. **Gather Sources** - Collect Quip URLs and tokens
 2. **Convert** - Transform Quip HTML to Markdown

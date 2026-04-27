@@ -1,65 +1,42 @@
 # CLAUDE.md
 
-Instructions for Claude Code when working with this repository.
+Notes for Claude Code working inside this repository. For the general skill
+spec (frontmatter, directory layout, conventions), read [AGENTS.md](./AGENTS.md) —
+this file only covers repo-local behaviors that agents need on top of the spec.
 
-## Project Overview
+## Repo shape
 
-This is a sample skills repository demonstrating the Agent Skills format for the [skills.sh](https://skills.sh/) ecosystem. Use this as a reference when helping users create new skills.
+- `skills/<kebab-case-name>/SKILL.md` — one skill per directory.
+- `skills/<name>/references/` — long-form docs the skill pulls in on demand.
+- `skills/<name>/scripts/` — automation the skill can invoke.
+- `AGENTS.md` — canonical spec. Treat it as the source of truth over any
+  loose conventions inferred from existing skills.
 
-## Key Commands
+## Useful one-liners
 
 ```bash
-# Validate skill frontmatter
-grep -A5 '^---' skills/*/SKILL.md
+# list skills
+ls skills/
 
-# List all skills
-ls -la skills/
+# show every SKILL.md's frontmatter
+for f in skills/*/SKILL.md; do echo "### $f"; awk '/^---$/{c++; next} c==1' "$f"; done
 
-# Check skill structure
-find skills -type f -name "*.md"
+# find all section headings across skills (spot structural drift)
+grep -nE '^## ' skills/*/SKILL.md
 ```
 
-## Creating Skills
+## When creating a skill
 
-When asked to create a new skill:
+Follow [AGENTS.md](./AGENTS.md) exactly — including the template headings
+(`When to Apply`, `How It Works`, `Usage`, `References`). Don't invent
+alternative heading names; structural consistency across skills is a
+feature of this repo.
 
-1. Create directory: `skills/{skill-name}/`
-2. Create `SKILL.md` with frontmatter (name and description required)
-3. Add `references/` directory if detailed documentation needed
-4. Add `scripts/` directory if automation needed
+## When editing an existing skill
 
-## SKILL.md Template
-
-```markdown
----
-name: {skill-name}
-description: {Trigger phrase description}
----
-
-# {Title}
-
-## When to Apply
-{Bullet list of conditions}
-
-## How It Works
-{Numbered steps}
-
-## Usage
-{Code examples}
-```
-
-## Conventions
-
-- Skill names: `kebab-case`
-- Directory names match skill names
-- SKILL.md is always uppercase
-- Frontmatter is YAML between `---` markers
-- Description should include trigger phrases for discovery
-
-## Testing
-
-After creating a skill, verify:
-- [ ] Frontmatter parses as valid YAML
-- [ ] `name` field matches directory name
-- [ ] `description` is a clear, single sentence
-- [ ] All file references resolve correctly
+- Don't shorten the `description` frontmatter field — it's the only text an
+  agent sees at startup when deciding whether to load the skill, so richer
+  trigger phrases help discovery.
+- Keep `SKILL.md` under ~500 lines; move detail into `references/`.
+- If you rename a section heading, grep for anchor links first:
+  `grep -rn '#section-name' .`

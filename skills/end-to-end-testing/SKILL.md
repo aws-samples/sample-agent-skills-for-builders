@@ -20,7 +20,7 @@ Reference this skill when:
 - Generating test reports
 - Documenting defects systematically
 
-## Workflow Phases
+## How It Works
 
 ### Phase 1: Preparation
 - Gather environment information

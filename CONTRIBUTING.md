@@ -1,79 +1,60 @@
-# Contributing Guidelines
+# Contributing
 
-Thank you for your interest in contributing to this project. Whether it's a bug report, new feature,
-correction, or additional documentation, we greatly value feedback and contributions from our community.
+Thanks for your interest in contributing. Bug reports, new skills, fixes, and
+documentation improvements are all welcome.
 
-Please read through this document before submitting any issues or pull requests to ensure we have all
-the necessary information to effectively respond to your bug report or contribution.
+## Reporting bugs or requesting features
 
-## Reporting Bugs/Feature Requests
+Please use the GitHub issue tracker. Before opening a new issue, check
+existing open and recently closed issues to avoid duplicates. Helpful issues
+usually include:
 
-We welcome you to use the GitHub issue tracker to report bugs or suggest features.
-
-When filing an issue, please check existing open, or recently closed, issues to make sure somebody else
-hasn't already reported the issue. Please try to include as much information as you can. Details like
-these are incredibly useful:
-
-- A reproducible test case or series of steps
-- The version of the code being used
-- Any modifications you've made relevant to the bug
+- A minimal reproduction or step-by-step scenario
+- The version of the code (commit SHA or release tag)
+- Relevant local modifications
 - Anything unusual about your environment or deployment
 
-## Contributing via Pull Requests
+## Pull requests
 
-Contributions via pull requests are much appreciated. Before sending us a pull request, please ensure that:
+1. Work against the latest `main`.
+2. Check open and recently merged PRs to avoid duplicate effort. For
+   non-trivial changes, open an issue first to agree on direction.
+3. Fork, branch, and keep the diff focused on one change — avoid bundling
+   unrelated reformatting.
+4. Run any local tests or validation steps relevant to your change.
+5. Open the PR with a clear description and respond to CI feedback.
 
-1. You are working against the latest source on the *main* branch.
-2. You check existing open, and recently merged, pull requests to make sure someone else hasn't
-   addressed the problem already.
-3. You open an issue to discuss any significant work — we would hate for your time to be wasted.
+## Contributing a new skill
 
-To send us a pull request, please:
+The skill spec (frontmatter, directory layout, heading conventions) lives
+in **[AGENTS.md](./AGENTS.md)**. The quick-start is in the
+[README](./README.md#author-a-skill). Before opening a PR, verify:
 
-1. Fork the repository.
-2. Modify the source; please focus on the specific change you are contributing. If you also reformat all
-   the code, it will be hard for us to focus on your change.
-3. Ensure local tests pass.
-4. Commit to your fork using clear commit messages.
-5. Send us a pull request, answering any default questions in the pull request interface.
-6. Pay attention to any automated CI failures reported in the pull request, and stay involved in the
-   conversation.
+- [ ] `SKILL.md` frontmatter is valid YAML
+- [ ] `name` matches the directory name (kebab-case)
+- [ ] `description` reads as trigger phrases, not a flat summary
+- [ ] Section headings match the template in AGENTS.md
+- [ ] All referenced files (`references/*`, `scripts/*`) exist
+- [ ] `SKILL.md` stays under ~500 lines (push detail into `references/`)
 
-GitHub provides additional documentation on
-[forking a repository](https://help.github.com/articles/fork-a-repo/) and
-[creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
+## Finding something to work on
 
-## Contributing a New Skill
+Issues labeled `help wanted` or `good first issue` are a good starting
+point.
 
-1. Create a new directory under `skills/` using `kebab-case` (e.g., `skills/my-skill/`).
-2. Add a `SKILL.md` with required YAML frontmatter (`name`, `description`). See [AGENTS.md](./AGENTS.md)
-   for the full format.
-3. Optionally add `references/` for supporting documentation and `scripts/` for automation.
-4. Verify your skill:
-   - Frontmatter parses as valid YAML
-   - `name` field matches the directory name
-   - `description` is a clear, single sentence with trigger phrases
-   - All referenced files resolve
+## Security issues
 
-## Finding Contributions to Work On
+**Do not open public issues for security vulnerabilities.** Report them via
+the [AWS vulnerability reporting page](http://aws.amazon.com/security/vulnerability-reporting/).
 
-Looking at the existing issues is a great way to find something to contribute on. As our projects, by
-default, use the default GitHub issue labels (enhancement/bug/duplicate/help wanted/invalid/question/wontfix),
-looking at any 'help wanted' issues is a great place to start.
+## Code of conduct
 
-## Code of Conduct
-
-This project has adopted the [Amazon Open Source Code of Conduct](https://aws.github.io/code-of-conduct).
-For more information see the [Code of Conduct FAQ](https://aws.github.io/code-of-conduct-faq) or contact
-opensource-codeofconduct@amazon.com with any additional questions or comments.
-
-## Security Issue Notifications
-
-If you discover a potential security issue in this project we ask that you notify AWS/Amazon Security via
-our [vulnerability reporting page](http://aws.amazon.com/security/vulnerability-reporting/). Please do
-**not** create a public GitHub issue.
+This project follows the
+[Amazon Open Source Code of Conduct](https://aws.github.io/code-of-conduct).
+See the [Code of Conduct FAQ](https://aws.github.io/code-of-conduct-faq) or
+email opensource-codeofconduct@amazon.com for questions.
 
 ## Licensing
 
-See the [LICENSE](LICENSE) file for our project's licensing. We will ask you to confirm the licensing of
-your contribution.
+See [LICENSE](./LICENSE). We will ask you to confirm the licensing of your
+contribution as part of the PR.

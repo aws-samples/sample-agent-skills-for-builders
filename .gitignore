@@ -31,3 +31,7 @@ build/
 .cache/
 repos/
 .ash/
+
+# Claude Code
+.agents/
+skills-lock.json

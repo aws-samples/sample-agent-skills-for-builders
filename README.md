@@ -1,130 +1,124 @@
 # Sample Agent Skills for Builders
 
-A curated collection of ready-to-use agent skills covering AWS development, security scanning, testing, and AI coding workflows. Skills are self-contained capability packs that extend AI coding agents (Claude Code, Cursor, Copilot, etc.) with specialized knowledge, reference material, and automation scripts — drop a skill directory into your agent's skills folder and it's live.
+> A curated, open collection of agent skills that extend AI coding agents (Claude Code, Cursor, Copilot, …) with production-ready AWS, CDK, and engineering workflows.
 
-This repository also serves as a reference for builders authoring their own skills.
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
+[![Format: skills.sh](https://img.shields.io/badge/format-skills.sh-informational)](https://skills.sh/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 
-## Installation
+Skills are self-contained capability packs. An agent loads only the skill name and one-line description at startup and pulls the full instructions, references, and scripts on demand — so you can ship dozens of capabilities without eating the context window.
 
-Install skills from this repository using [`skills.sh`](https://skills.sh/) via `npx`.
+This repository is both:
 
-Install all skills from the repository:
+- **a ready-to-use library** — install any skill with a single `npx` command; and
+- **a reference implementation** — copy the format when authoring your own.
+
+---
+
+## Contents
+
+- [Install](#install)
+- [Available Skills](#available-skills)
+- [Author a Skill](#author-a-skill)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Install
+
+Skills are installed with [`skills.sh`](https://skills.sh/) via `npx`.
 
 ```bash
+# install every skill in this repo
 npx skills add https://github.com/aws-samples/sample-agent-skills-for-builders
-```
 
-Install a specific skill by name:
-
-```bash
+# or install just one
 npx skills add https://github.com/aws-samples/sample-agent-skills-for-builders --skill security-scan
 ```
 
-Once this repository is registered on [skills.sh](https://skills.sh/), you will also be able to
-browse all skills at `skills.sh/aws-samples/sample-agent-skills-for-builders`.
+Once this repository is registered on [skills.sh](https://skills.sh/), you will also be able to browse it at `skills.sh/aws-samples/sample-agent-skills-for-builders`.
 
 ## Available Skills
 
-| Skill | Description |
-|-------|-------------|
-| [create-install-scripts](skills/create-install-scripts/) | CI/CD installation scripts for AWS CDK projects |
-| [cost-estimator](skills/cost-estimator/) | AWS cost estimation with real-time pricing |
-| [security-scan](skills/security-scan/) | Security and compliance scanning for CDK |
-| [end-to-end-testing](skills/end-to-end-testing/) | Systematic E2E testing workflow |
-| [quip-to-gitlab-wiki](skills/quip-to-gitlab-wiki/) | Quip to GitLab Wiki migration |
-| [strands-context-manager](skills/strands-context-manager/) | Strands conversation manager pattern |
-| [aws-mcp-setup](skills/aws-mcp-setup/) | AWS Documentation MCP configuration |
-| [aws-cdk-development](skills/aws-cdk-development/) | CDK best practices with AWS CDK MCP |
-| [aws-cost-operations](skills/aws-cost-operations/) | Cost estimation and operational excellence |
-| [aws-agentic-ai](skills/aws-agentic-ai/) | Bedrock AgentCore AI agent deployment |
+### AWS foundation
 
-## Creating Your Own Skills
+| Skill | What it does |
+|-------|--------------|
+| [aws-mcp-setup](skills/aws-mcp-setup/) | Configure the AWS MCP servers (full server + documentation-only) so agents can query AWS docs and invoke AWS APIs. Prerequisite for the other `aws-*` skills. |
 
-See [AGENTS.md](./AGENTS.md) for detailed instructions on creating new skills.
+### CDK development
 
-### Quick Start
+| Skill | What it does |
+|-------|--------------|
+| [aws-cdk-development](skills/aws-cdk-development/) | CDK expert for TypeScript/Python — app structure, construct patterns, stack composition, and deployment workflows, with MCP-assisted validation. |
+| [create-install-scripts](skills/create-install-scripts/) | Generate interactive `install.sh`, GitLab CI pipelines, and CodeBuild setup for CDK projects. |
+| [cost-estimator](skills/cost-estimator/) | Estimate CDK infrastructure cost before deploy using real-time AWS Price List data. Produces Markdown and Excel reports. |
+| [security-scan](skills/security-scan/) | Aggregated SAST / IaC / secrets / license / container scanning for CDK projects via the Automated Security Helper (ASH). |
 
-1. Create a new directory under `skills/`:
-   ```bash
-   mkdir -p skills/my-skill
-   ```
+### AWS operations & AI
 
-2. Create `SKILL.md` with required frontmatter:
-   ```markdown
-   ---
-   name: my-skill
-   description: One sentence describing when to use this skill. Include trigger phrases.
-   ---
+| Skill | What it does |
+|-------|--------------|
+| [aws-cost-operations](skills/aws-cost-operations/) | Analyze AWS bills, set CloudWatch alarms, query logs, audit CloudTrail, and tighten operational excellence. |
+| [aws-agentic-ai](skills/aws-agentic-ai/) | Deploy and manage agents on Bedrock AgentCore — Gateway, Runtime, Memory, Identity, Code Interpreter, Browser, Observability, Registry, and Evaluations. |
 
-   # My Skill
+### Engineering workflows
 
-   {Description and instructions}
-   ```
+| Skill | What it does |
+|-------|--------------|
+| [end-to-end-testing](skills/end-to-end-testing/) | Systematic E2E testing workflow with evidence capture (screenshots, logs) and report generation. |
+| [quip-to-gitlab-wiki](skills/quip-to-gitlab-wiki/) | Migrate Quip documents to GitLab Wiki with full text and media preservation. |
+| [strands-context-manager](skills/strands-context-manager/) | Sliding-window + summarization pattern for managing long conversations in Strands Agents. |
 
-3. Add optional supporting files:
-   - `references/` - Additional documentation
-   - `scripts/` - Helper automation scripts
-   - `metadata.json` - Extended metadata
+## Author a Skill
 
-### Skill Structure
+The full spec lives in [AGENTS.md](./AGENTS.md). The 60-second version:
 
+```bash
+mkdir -p skills/my-skill
 ```
-skills/
-  my-skill/
-    SKILL.md              # Required: skill definition with frontmatter
-    metadata.json         # Optional: version, author, references
-    references/           # Optional: supporting documentation
-    scripts/              # Optional: automation scripts
-```
-
-## Skill Format
-
-Every skill requires a `SKILL.md` file with YAML frontmatter:
 
 ```markdown
 ---
-name: skill-name              # Required: kebab-case identifier
-description: When to use...   # Required: trigger phrases for discovery
-license: MIT                  # Optional: defaults to repository license
-metadata:                     # Optional: extended metadata
-  author: your-name
-  version: "1.0.0"
+name: my-skill
+description: One sentence describing when to activate. Include the exact trigger phrases a user might say.
 ---
 
-# Skill Title
+# My Skill
 
 ## When to Apply
-{Conditions that should trigger this skill}
+- …
 
 ## How It Works
-{Step-by-step workflow}
+1. …
 
 ## Usage
-{Examples with code blocks}
+…
 ```
+
+Optional supporting files:
+
+```
+skills/my-skill/
+  SKILL.md         # required
+  metadata.json    # optional: version, author, tags
+  references/      # optional: long-form docs, loaded on demand
+  scripts/         # optional: automation invoked by the agent
+```
+
+Rules of thumb:
+
+- **Kebab-case** directory names that match the `name` field in frontmatter.
+- **Keep `SKILL.md` under ~500 lines** — push long content into `references/` so it only loads when the agent decides to use it.
+- **Write the `description` as trigger phrases** — it is the only text an agent sees at startup when deciding whether to pull the skill.
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to
-contribute a new skill or improve an existing one.
+Issues and pull requests are welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for the PR workflow and [AGENTS.md](./AGENTS.md) for the skill spec.
 
-Short version:
+To report a security issue, please use the [AWS vulnerability reporting page](http://aws.amazon.com/security/vulnerability-reporting/) rather than opening a public issue.
 
-1. Fork this repository
-2. Create your skill in the `skills/` directory (see any existing skill as a reference)
-3. Follow the format documented in [AGENTS.md](./AGENTS.md)
-4. Submit a pull request
-
-## Security
-
-See [CONTRIBUTING](./CONTRIBUTING.md#security-issue-notifications) for information about reporting
-security issues.
-
-## Code of Conduct
-
-This project has adopted the [Amazon Open Source Code of Conduct](https://aws.github.io/code-of-conduct).
-See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) for details.
+This project adopts the [Amazon Open Source Code of Conduct](https://aws.github.io/code-of-conduct); see [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
 
 ## License
 
-This library is licensed under the Apache-2.0 License. See the [LICENSE](./LICENSE) file.
+Apache-2.0. See [LICENSE](./LICENSE).
