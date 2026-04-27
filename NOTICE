@@ -1,2 +1,19 @@
 Sample Agent Skills for Builders
 Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+----------------------------------------------------------------------------
+
+This product includes software from the following third-party project:
+
+zxkane/aws-skills (https://github.com/zxkane/aws-skills)
+Licensed under the MIT License.
+Copyright (c) 2025 Mengxin Zhu.
+
+The following skills in this repository are derived from zxkane/aws-skills
+and are redistributed under the MIT License (see each skill's
+LICENSE.upstream file):
+
+  - skills/aws-mcp-setup/
+  - skills/aws-cdk-development/
+  - skills/aws-cost-operations/
+  - skills/aws-agentic-ai/

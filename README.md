@@ -35,17 +35,14 @@ Claude Code). Most agents discover skills automatically on session start.
 | [end-to-end-testing](skills/end-to-end-testing/) | Systematic E2E testing workflow |
 | [quip-to-gitlab-wiki](skills/quip-to-gitlab-wiki/) | Quip to GitLab Wiki migration |
 | [strands-context-manager](skills/strands-context-manager/) | Strands conversation manager pattern |
+| [aws-mcp-setup](skills/aws-mcp-setup/) | AWS Documentation MCP configuration |
+| [aws-cdk-development](skills/aws-cdk-development/) | CDK best practices with AWS CDK MCP |
+| [aws-cost-operations](skills/aws-cost-operations/) | Cost estimation and operational excellence |
+| [aws-agentic-ai](skills/aws-agentic-ai/) | Bedrock AgentCore AI agent deployment |
 
-## Related Skills
-
-Additional AWS-focused skills available at [zxkane/aws-skills](https://github.com/zxkane/aws-skills):
-
-| Skill | Description |
-|-------|-------------|
-| [aws-mcp-setup](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-common/skills/aws-mcp-setup) | AWS Documentation MCP configuration |
-| [aws-cdk-development](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-cdk/skills/aws-cdk-development) | CDK best practices with AWS CDK MCP |
-| [aws-cost-operations](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-cost-ops/skills/aws-cost-operations) | Cost estimation and optimization |
-| [aws-agentic-ai](https://github.com/zxkane/aws-skills/tree/main/plugins/aws-agentic-ai/skills/aws-agentic-ai) | Bedrock AgentCore AI agent deployment |
+The last four skills are adapted from [zxkane/aws-skills](https://github.com/zxkane/aws-skills)
+(MIT License, © 2025 Mengxin Zhu). See each skill's `LICENSE.upstream` file and the
+[NOTICE](./NOTICE) file for attribution.
 
 ## Creating Your Own Skills
 
