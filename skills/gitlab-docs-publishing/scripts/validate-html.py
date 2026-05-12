@@ -44,7 +44,7 @@ def main():
         print("Usage: validate-html.py <file.html>", file=sys.stderr)
         sys.exit(1)
 
-    html = Path(sys.argv[1]).read_text()
+    html = Path(sys.argv[1]).read_text(encoding="utf-8")
 
     print(f"=== {sys.argv[1]} — {len(html):,} bytes ===\n")
 
