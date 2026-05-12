@@ -1,0 +1,57 @@
+# GitLab Pages deployment template for technical design docs.
+#
+# What it does:
+#   - Runs on every push to main
+#   - Copies docs/<VERSION>/*.html → public/<VERSION>/index.html
+#   - Copies companion .md files for reference
+#   - Generates a simple landing index.html at project root
+#
+# After merge, docs are served at the project Pages URL. Check
+# Settings → Pages in your GitLab project for the exact hostname.
+#
+# Placeholders to replace before committing:
+#   <VERSION>   → e.g. v1.0.0 or latest
+#   <MAIN_HTML> → e.g. tech-design.html (the main HTML doc)
+
+pages:
+  stage: deploy
+  image: alpine:3.20
+  script:
+    - mkdir -p public/<VERSION>
+    - cp docs/<VERSION>/<MAIN_HTML> public/<VERSION>/index.html
+    - cp docs/<VERSION>/*.md public/<VERSION>/ 2>/dev/null || true
+    - |
+      cat > public/index.html <<'HTML'
+      <!DOCTYPE html>
+      <html lang="zh-CN">
+      <head>
+        <meta charset="UTF-8">
+        <title>Project Documentation</title>
+        <style>
+          body { font-family: -apple-system, system-ui, 'Segoe UI', sans-serif;
+                 max-width: 720px; margin: 80px auto; padding: 0 24px; color: #16191f; }
+          h1 { color: #232f3e; }
+          ul { line-height: 2; }
+          a { color: #0972d3; text-decoration: none; }
+          a:hover { text-decoration: underline; }
+          .meta { color: #879596; font-size: 13px; margin-top: 24px; }
+        </style>
+      </head>
+      <body>
+        <h1>Project Documentation</h1>
+        <ul>
+          <li><a href="<VERSION>/"><VERSION> Technical Design</a></li>
+        </ul>
+        <div class="meta">Hosted on GitLab Pages · Auto-updated on push to main.</div>
+      </body>
+      </html>
+      HTML
+  artifacts:
+    paths:
+      - public
+    expire_in: never
+  # NOTE: We intentionally don't use `changes:` here. Merge-commit diffs can
+  # bypass `changes:` rules, causing the Pages pipeline to skip. Trigger on
+  # every main push instead — the job is cheap.
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"

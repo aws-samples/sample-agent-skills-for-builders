@@ -66,6 +66,7 @@ Once this repository is registered on [skills.sh](https://skills.sh/), you will 
 | Skill | What it does |
 |-------|--------------|
 | [end-to-end-testing](skills/end-to-end-testing/) | Systematic E2E testing workflow with evidence capture (screenshots, logs) and report generation. |
+| [gitlab-docs-publishing](skills/gitlab-docs-publishing/) | Publish styled HTML design docs on GitLab Pages and inject per-section discuss buttons that open pre-filled Issues. |
 | [quip-to-gitlab-wiki](skills/quip-to-gitlab-wiki/) | Migrate Quip documents to GitLab Wiki with full text and media preservation. |
 | [strands-context-manager](skills/strands-context-manager/) | Sliding-window + summarization pattern for managing long conversations in Strands Agents. |
 
