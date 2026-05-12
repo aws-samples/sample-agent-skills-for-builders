@@ -29,8 +29,10 @@ If your document uses different class names, customize via the
 --heading-classes and --table-wrap-class flags.
 """
 import argparse
+import os
 import re
 import sys
+import tempfile
 from pathlib import Path
 from urllib.parse import quote
 
@@ -328,14 +330,28 @@ def main():
     args = parser.parse_args()
 
     path = Path(args.html)
-    original = path.read_text()
+    original = path.read_text(encoding="utf-8")
     new_html, stats = process(original, args)
 
     if args.dry_run:
         print(f"[dry-run] Would inject: {stats}")
         return
 
-    path.write_text(new_html)
+    # Atomic write: write to a sibling temp file, then replace — so a crash
+    # mid-write can't leave the HTML half-rewritten.
+    fd, tmp_path = tempfile.mkstemp(
+        prefix=path.name + ".", suffix=".tmp", dir=str(path.parent)
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(new_html)
+        os.replace(tmp_path, path)
+    except Exception:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
     print(
         f"Done. Injected {stats['headings']} heading buttons, "
         f"{stats['figures']} figure buttons, {stats['tables']} table buttons. "
