@@ -1,0 +1,26 @@
+/* Game AI QA — Doc comments widget styles
+ *
+ * Minimal: just the floating "💬 添加评论" bubble that appears above a text
+ * selection. Click → opens GitLab Issue creation in a new tab.
+ */
+
+/* ── Bubble (selection floater) ────────────────────────────────────────── */
+#dc-bubble {
+  position: absolute;
+  z-index: 9999;
+  display: inline-block;
+  background: #ff9900;
+  color: #fff;
+  font: 600 12px/1.2 -apple-system, system-ui, "Segoe UI", "PingFang SC", sans-serif;
+  border-radius: 16px;
+  padding: 6px 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  user-select: none;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background 0.12s, transform 0.08s;
+}
+#dc-bubble:hover { background: #e88b00; }
+#dc-bubble:active { transform: scale(0.96); }
+#dc-bubble[hidden] { display: none; }

@@ -15,10 +15,19 @@
 
 pages:
   stage: deploy
-  image: alpine:3.20
+  image: python:3.11-alpine
   script:
     - mkdir -p public/<VERSION>
-    - cp docs/<VERSION>/<MAIN_HTML> public/<VERSION>/index.html
+    # Inject the selection-bubble widget + heading/figure/table ids into the
+    # published HTML. Outputs index.html and copies comment-widget.{js,css}
+    # into public/<VERSION>/_assets. See SKILL.md for config-json schema.
+    - python3 scripts/inject-comments.py
+        --html docs/<VERSION>/<MAIN_HTML>
+        --out  public/<VERSION>/index.html
+        --assets-dir public/<VERSION>/_assets
+        --assets-url _assets
+        --config-json docs/<VERSION>/comments-issue.json
+        --page-key <VERSION>/<MAIN_HTML>
     - cp docs/<VERSION>/*.md public/<VERSION>/ 2>/dev/null || true
     - |
       cat > public/index.html <<'HTML'

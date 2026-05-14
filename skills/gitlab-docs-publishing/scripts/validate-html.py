@@ -1,24 +1,31 @@
 #!/usr/bin/env python3
-"""
-Validate an HTML doc for balanced tags and discussable-anchor coverage.
+"""Validate an HTML doc before publishing.
 
 Checks:
-  1. Every tag opens and closes cleanly (simple stack-based parser)
-  2. Every discuss-button href anchor (#xxx) has a matching id in the DOM
-  3. Count of buttons, anchors, mermaid figures, tables
+  1. Every tag opens and closes cleanly (simple stack-based parser).
+  2. Headings have id attributes (so widget-generated anchor URLs scroll
+     to the right place after submission).
+  3. Counts: sections, headings, mermaid figures, tables.
 
-Usage:
+Run on the source HTML before the inject step:
+
     python3 validate-html.py docs/v1.0.0/tech-design.html
+
+Or on the published HTML to confirm the inject step ran:
+
+    python3 validate-html.py public/v1.0.0/index.html
 """
 import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import unquote
 
 
 class TagBalance(HTMLParser):
-    VOID = {"br", "hr", "meta", "link", "img", "input", "area", "base", "col", "embed", "source", "track", "wbr"}
+    VOID = {
+        "br", "hr", "meta", "link", "img", "input", "area",
+        "base", "col", "embed", "source", "track", "wbr",
+    }
 
     def __init__(self):
         super().__init__()
@@ -36,7 +43,13 @@ class TagBalance(HTMLParser):
         if self.stack and self.stack[-1] == tag:
             self.stack.pop()
         else:
-            self.errors.append(f"expected </{self.stack[-1] if self.stack else '?'}> got </{tag}>")
+            self.errors.append(
+                f"expected </{self.stack[-1] if self.stack else '?'}> got </{tag}>"
+            )
+
+
+HEADING_RE = re.compile(r'<(h[1-6])([^>]*)>', re.IGNORECASE)
+ID_ATTR_RE = re.compile(r'\bid\s*=\s*"([^"]+)"', re.IGNORECASE)
 
 
 def main():
@@ -45,7 +58,6 @@ def main():
         sys.exit(1)
 
     html = Path(sys.argv[1]).read_text(encoding="utf-8")
-
     print(f"=== {sys.argv[1]} — {len(html):,} bytes ===\n")
 
     # 1. Tag balance
@@ -60,31 +72,30 @@ def main():
     if bal.stack:
         print(f"   Unclosed tags at EOF: {bal.stack[-5:]}")
 
-    # 2. Anchor coverage
-    ids = set(re.findall(r' id="([^"]+)"', html))
-    button_anchors = set()
-    for m in re.finditer(r'href="[^"]*issue\[description\]=([^"&]+)', html):
-        desc = unquote(m.group(1))
-        for am in re.finditer(r"#([a-zA-Z0-9_-]+)", desc):
-            button_anchors.add(am.group(1))
-    missing = button_anchors - ids
-    if missing:
-        print(f"❌ Anchor coverage: {len(missing)} button anchors have no matching id")
-        for a in sorted(missing)[:10]:
-            print(f"   - #{a}")
+    # 2. Heading id coverage
+    headings = HEADING_RE.findall(html)
+    headings_without_id = [
+        tag for tag, attrs in headings if not ID_ATTR_RE.search(attrs)
+    ]
+    if headings_without_id:
+        print(
+            f"⚠ Heading ids: {len(headings_without_id)} of {len(headings)} "
+            f"h1..h6 have no id (run inject-comments.py to add them)"
+        )
     else:
-        print(f"✅ Anchor coverage: all {len(button_anchors)} referenced anchors exist")
+        print(f"✅ Heading ids: all {len(headings)} h1..h6 have id attributes")
 
     # 3. Counts
     print()
-    print(f"Sections (h2): {len(re.findall(r'<section class=.aws-sec.', html))}")
-    print(f"Headings (h2/h3/h4): {sum(1 for _ in re.finditer(r'<h[234] class=.aws-', html))}")
-    print(f"Mermaid figures: {html.count('<div class=\"diagram-frame\"')}")
-    print(f"Tables: {html.count('<div class=\"aws-table-wrap\"')}")
-    print(f"Discuss buttons: {html.count('class=\"discuss-btn\"') + html.count('class=\"discuss-inline\"')}")
-    print(f"Prefilled issue URLs: {len(re.findall(r'issues/new\\?issue%5Btitle%5D=', html))}")
+    print(f"Headings (h1..h6):   {len(headings)}")
+    print(f"Mermaid figures:     {html.count('<div class=\"diagram-frame\"')}")
+    print(f"Tables (aws-table):  {html.count('<div class=\"aws-table-wrap\"')}")
+    print(
+        "Widget injected:     "
+        + ("yes" if 'doc-comments-injected' in html else "no")
+    )
 
-    if bal.errors or missing:
+    if bal.errors:
         sys.exit(1)
 
 
