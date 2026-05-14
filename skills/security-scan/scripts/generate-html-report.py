@@ -7,7 +7,23 @@ Usage: python generate-html-report.py <scan_dir>
 import sys
 import os
 import base64
+import json
 from pathlib import Path
+
+
+def js_string(s):
+    """Encode a Python string as a JS string literal safe to embed inside <script>.
+
+    Plain repr()/json.dumps don't escape '</script>', '<!--', or U+2028/U+2029,
+    any of which can break out of an inline script block.
+    """
+    return (
+        json.dumps(s, ensure_ascii=False)
+        .replace('</', '<\\/')
+        .replace('<!--', '<\\!--')
+        .replace(' ', '\\u2028')
+        .replace(' ', '\\u2029')
+    )
 
 def read_file(filepath):
     """Read file content, return empty string if not exists."""
@@ -521,7 +537,7 @@ def generate_html(scan_dir):
                 <div class="markdown-body" id="ash-md-content"></div>
             </div>
             <div id="subtab-ash-html" class="sub-tab-content" style="display: none;">
-                <iframe class="ash-html-frame" srcdoc="{escape_html(ash_html).replace(chr(34), '&quot;')}" sandbox="allow-same-origin"></iframe>
+                <iframe class="ash-html-frame" srcdoc="{escape_html(ash_html).replace(chr(34), '&quot;')}" sandbox=""></iframe>
             </div>
             <div id="subtab-ash-yaml" class="sub-tab-content" style="display: none;">
                 <div class="code-block">
@@ -557,10 +573,10 @@ def generate_html(scan_dir):
     <script>
         // Markdown content
         const markdownContent = {{
-            summary: {repr(summary_md)},
-            license: {repr(license_md)},
-            trivy: {repr(trivy_md)},
-            ashMd: {repr(ash_md)}
+            summary: {js_string(summary_md)},
+            license: {js_string(license_md)},
+            trivy: {js_string(trivy_md)},
+            ashMd: {js_string(ash_md)}
         }};
 
         // Render markdown
