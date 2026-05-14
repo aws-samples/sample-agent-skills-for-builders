@@ -1,128 +1,137 @@
 ---
 name: gitlab-docs-publishing
-description: Publish HTML/Markdown design documents on GitLab with reviewer comments. Use when you need GitLab Pages auto-deploy, Issue-based discussion buttons with URL prefill, precise anchors for every heading/figure/table, and per-discussion Issue-creation links for any GitLab project hosting shareable, commentable technical design docs.
+description: Publish HTML/Markdown design documents on GitLab Pages with selection-driven discussion. Reviewers select any text in the published doc; a floating 💬 bubble opens a prefilled GitLab Issue (title + anchor link + selection quote + label) in a new tab. GitLab handles auth via the user's existing session — no OAuth, no PAT, no API calls. Works on gitlab.com, self-hosted, and proxy-fronted GitLab.
 license: MIT
 metadata:
   author: sample-skills-for-builders
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 
 # GitLab Docs Publishing
 
-Publish styled HTML design docs on GitLab so the team can read them in a browser
-and file per-section feedback as Issues — with zero external services.
+Publish styled HTML design docs on GitLab Pages and let reviewers file
+in-context feedback by **selecting any text** and clicking a floating 💬
+bubble — which opens a pre-filled GitLab Issue in a new tab. Zero external
+services, zero in-page API calls.
 
 Standalone HTML design docs are great for reading but miss two things GitLab
-does not provide out of the box: a public URL (GitLab renders `.html` blobs as
-source code, not as a page) and an in-context comment thread tied to each
-section, figure, or table. This skill bolts both on using only free GitLab
-features:
+does not provide out of the box: a public URL (GitLab renders `.html` blobs
+as source code, not as a page) and an in-context comment thread tied to the
+exact piece of prose a reviewer wants to discuss. This skill bolts both on
+using only free GitLab features:
 
-- **GitLab Pages** auto-publishes HTML on every merge to main → public URL like
-  `https://<group>.<gitlab-host>/<project>/`.
-- **Per-section 💬 buttons** create pre-filled Issues with title, anchor link,
-  and description template — reviewers click, write feedback, submit.
-
-Works on `gitlab.com`, self-hosted GitLab, and internal GitLab instances.
+- **GitLab Pages** auto-publishes HTML on every merge to main.
+- **Selection-driven 💬 bubble** — a small JS widget watches text selection.
+  On click, it navigates the browser to GitLab's "New issue" page with title
+  + description + label prefilled. GitLab authenticates the user with their
+  existing session cookie.
 
 ## When to Apply
-
-Reference this skill when:
 
 - Publishing a technical design doc (HTML or Markdown) for team review.
 - Teammates complain they have to `git clone` to see the styled HTML version.
 - Meeting feedback gets lost because there's no place to write it against
-  specific sections.
-- You want reviewers to file Issues per topic instead of one giant email thread.
-- An HTML visual doc has been generated from source Markdown (a common output
-  of design-doc workflows) and now needs a distribution channel.
+  specific sentences.
+- An HTML visual doc has been generated from source Markdown and now needs
+  a distribution channel with feedback affordances.
 
 **Not for:**
 
-- Documents that belong in GitLab Wiki (Wiki renders Markdown natively and has
-  built-in comments).
+- Documents that belong in GitLab Wiki (Wiki renders Markdown natively and
+  has built-in comments).
 - Single-reviewer review — use MR line comments instead.
 - External/public audiences who do not have GitLab accounts.
 
 ## How It Works
 
-1. **Enable Pages** — Add `.gitlab-ci.yml` with a `pages` job that copies your
-   HTML under `public/` on every push to main. Template:
-   [`templates/gitlab-ci-pages.yml`](./templates/gitlab-ci-pages.yml).
-2. **Inject discuss buttons** — Run `scripts/inject-discuss-buttons.py` on the
-   generated HTML. Every `<h2>/<h3>/<h4>` gets an `id` (if missing) and a 💬
-   button; every mermaid `diagram-frame` gets `id="figure-N-M"`; every
-   `aws-table-wrap` gets `id="table-N-M"`.
-3. **Validate** — Run `scripts/validate-html.py` to confirm tag balance and
-   that every button anchor has a matching `id`.
-4. **Merge and share** — Push to main, wait for the Pages pipeline, then share
-   the Pages URL. Reviewers click 💬 buttons to file per-section Issues.
+```
+docs/<v>/foo.html
+   │
+   │ inject-comments.py:
+   │   1. Strip any pre-existing in-page widgets
+   │   2. Add ids to headings/figures/tables
+   │   3. Inject <link>+<script> for the selection-bubble widget
+   │   4. Copy comment-widget.{js,css} into <assets-dir>
+   ↓
+public/<v>/index.html  ──▶  GitLab Pages CI publishes public/
+                              ↓
+                     Reviewer opens published URL
+                     Selects any text → 💬 bubble appears
+                     Clicks → new tab on GitLab issues/new
+                     with title + description + label prefilled
+                     GitLab uses existing session cookie
+                     Reviewer types → submits → labelled Issue created
+```
 
 ## Usage
 
-### 1. Add the Pages CI job
+### Step 1 — Add the Pages CI job
 
 Copy [`templates/gitlab-ci-pages.yml`](./templates/gitlab-ci-pages.yml) into
-your project's `.gitlab-ci.yml` and replace `<VERSION>` / `<MAIN_HTML>`:
+your project's `.gitlab-ci.yml` and replace `<VERSION>` / `<MAIN_HTML>`.
+The template already runs the inject step (Step 2 explains its config).
+After merge to main, the doc is served at the project's Pages URL — check
+**Settings → Pages** for the exact host.
 
-```yaml
-pages:
-  stage: deploy
-  image: alpine:3.20
-  script:
-    - mkdir -p public/v1.0.0
-    - cp docs/v1.0.0/tech-design.html public/v1.0.0/index.html
-    - cp docs/v1.0.0/*.md public/v1.0.0/ 2>/dev/null || true
-  artifacts:
-    paths:
-      - public
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+### Step 2 — Configure the per-page Issue settings
+
+Commit a small per-page config:
+
+```json
+// docs/v1.0.0/comments-issue.json
+{
+  "gitlabHost": "https://gitlab.example.com",
+  "projectPath": "group/subgroup/project",
+  "pageUrl": "https://<pages-url>/v1.0.0/",
+  "titlePrefix": "[v1.0.0-tech-design]",
+  "issueLabels": "doc-comments"
+}
 ```
 
-After merge, the doc is served at `https://<group>.<gitlab-host>/<project>/v1.0.0/`.
-Self-hosted GitLab instances may use a different Pages host — check
-**Settings → Pages** in the project for the exact URL.
+The CI template invokes the injector with this config. The injector:
 
-### 2. Inject discuss buttons
+- Adds `id` attributes to every `<h1>`–`<h6>` (slug from heading text),
+  `<div class="diagram-frame">` (`figure-N`), and `<div class="aws-table-wrap">`
+  (`table-N`) so anchor URLs resolve.
+- Injects `<link rel="stylesheet">` and `<script defer>` referencing the
+  bundled widget assets.
+- Copies `comment-widget.{js,css}` into `--assets-dir`.
+- Is idempotent — re-running on the same HTML doesn't double up.
 
-```bash
-python3 scripts/inject-discuss-buttons.py \
-  --html docs/v1.0.0/tech-design.html \
-  --doc-url 'https://<group>.<gitlab-host>/<project>/v1.0.0/' \
-  --issue-new-url 'https://<gitlab>/<path>/<project>/-/issues/new' \
-  --title-prefix '[v1.0.0-tech-design]'
-```
-
-The script is idempotent — re-running it updates buttons in place rather than
-duplicating them.
-
-### 3. Validate before publishing
+### Step 3 — Validate before publishing
 
 ```bash
 python3 scripts/validate-html.py docs/v1.0.0/tech-design.html
 ```
 
-Confirms tag balance and that every button anchor (`#sec-4-3`, `#figure-4-2`,
-`#table-4-1`) has a matching `id` in the DOM.
+Confirms tag balance and that anchor IDs are present.
 
-### Deployment checklist
+### What the reviewer sees
+
+- The published doc renders normally — no extra buttons or chrome anywhere.
+- Selecting any text shows a small orange "💬 添加评论" / "💬 Add comment"
+  bubble above the selection.
+- Clicking opens a new tab on GitLab's New Issue page. Title is
+  `[<prefix>] §<heading-text> · "<first 30 chars of selection>…"`.
+  Description contains an anchor link (back to the section) plus the
+  selection quote, plus a hidden anchor JSON block for forward-compat tooling.
+- The reviewer types their comment under "Your comment:" and submits.
+
+### Deployment Checklist
 
 - [ ] HTML generated; tag balance and anchors validated.
-- [ ] `.gitlab-ci.yml` includes the `pages` job.
-- [ ] Injector ran; 💬 buttons visible next to every heading, figure, and table.
-- [ ] Clicking a sample 💬 button opens the GitLab new-Issue page with the
-  correct title and body.
-- [ ] After merge to main, the Pages URL serves the doc.
-- [ ] Anchor round-trip works: click a 💬 button, open the resulting Issue,
-  follow the link in the description → lands on the right section.
+- [ ] `.gitlab-ci.yml` includes the `pages` job and the inject step.
+- [ ] `comments-issue.json` is committed and has the right `gitlabHost`,
+      `projectPath`, and `pageUrl`.
+- [ ] Selecting text on the published page shows the bubble.
+- [ ] Clicking the bubble opens GitLab's New Issue page with prefilled
+      title, description, and label.
+- [ ] After submitting, the resulting Issue has a working anchor link in
+      its description that scrolls back to the right section.
 
 ## References
 
-- [Gotchas and common mistakes](./references/gotchas.md) — hard-learned
-  pitfalls: Wiki HTML sanitization, `rules: changes:` dropping merge commits,
-  anchor coverage on `h3`/`h4`, URL encoding.
+- [Gotchas and common mistakes](./references/gotchas.md)
 - [Discussion model: per-Issue vs. shared Issue](./references/discussion-model.md)
-  — tradeoffs and how to switch modes.
 - [GitLab Pages documentation](https://docs.gitlab.com/ee/user/project/pages/)
 - [GitLab Issues URL parameters](https://docs.gitlab.com/ee/user/project/issues/create_issues.html#using-a-url-with-prefilled-values)

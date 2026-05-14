@@ -1,8 +1,9 @@
 # GitLab Docs Publishing Skill
 
-Publish styled HTML design docs on GitLab Pages and inject per-section 💬
-buttons that open pre-filled GitLab Issues — so reviewers can comment in
-context without leaving the doc.
+Publish styled HTML design docs on GitLab Pages and let reviewers file
+**pre-filled GitLab Issues** for in-context discussion — by selecting any
+text in the doc and clicking a small floating 💬 bubble. No OAuth, no PAT,
+no in-browser API calls.
 
 ## Installation
 
@@ -16,40 +17,48 @@ npx skills add https://github.com/aws-samples/sample-agent-skills-for-builders -
 
 Copy [`templates/gitlab-ci-pages.yml`](./templates/gitlab-ci-pages.yml) into
 your project's `.gitlab-ci.yml` and replace the `<VERSION>` / `<MAIN_HTML>`
-placeholders:
+placeholders. The template already runs `inject-comments.py` against the
+config from Step 2.
 
-```yaml
-pages:
-  stage: deploy
-  image: alpine:3.20
-  script:
-    - mkdir -p public/v1.0.0
-    - cp docs/v1.0.0/tech-design.html public/v1.0.0/index.html
-  artifacts:
-    paths:
-      - public
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+After merge to main, the doc is served at your project's Pages URL — check
+**Settings → Pages** for the exact host.
+
+### 2. Configure the per-page Issue settings
+
+Commit a small per-page config:
+
+```json
+// docs/v1.0.0/comments-issue.json
+{
+  "gitlabHost": "https://gitlab.example.com",
+  "projectPath": "group/subgroup/project",
+  "pageUrl": "https://<pages-url>/v1.0.0/",
+  "titlePrefix": "[v1.0.0-tech-design]",
+  "issueLabels": "doc-comments"
+}
 ```
 
-After merge to main, the doc is served at
-`https://<group>.<gitlab-host>/<project>/v1.0.0/`. Self-hosted GitLab may use
-a different Pages host — check **Settings → Pages** for the exact URL.
-
-### 2. Inject discuss buttons
+The CI template's `pages` job already invokes the injector with this config.
+To run it locally for a smoke test:
 
 ```bash
-python3 scripts/inject-discuss-buttons.py \
+python3 scripts/inject-comments.py \
   --html docs/v1.0.0/tech-design.html \
-  --doc-url 'https://<group>.<gitlab-host>/<project>/v1.0.0/' \
-  --issue-new-url 'https://<gitlab>/<path>/<project>/-/issues/new' \
-  --title-prefix '[v1.0.0-tech-design]'
+  --out  public/v1.0.0/index.html \
+  --assets-dir public/v1.0.0/_assets \
+  --assets-url _assets \
+  --config-json docs/v1.0.0/comments-issue.json \
+  --page-key v1.0.0/tech-design.html
 ```
 
-Every `<h2>/<h3>/<h4>` gets an `id` (if missing) and a 💬 button; every
-mermaid `diagram-frame` gets `id="figure-N-M"`; every `aws-table-wrap` gets
-`id="table-N-M"`. The script is idempotent — re-running updates buttons in
-place.
+The injector:
+
+- Adds `id`s to every `<h1>`–`<h6>` (slug from heading text) and to
+  `<div class="diagram-frame">` (`figure-N`) and `<div class="aws-table-wrap">`
+  (`table-N`).
+- Injects a `<link>` and a deferred `<script>` referencing the bundled widget.
+- Copies `comment-widget.{js,css}` into `--assets-dir`.
+- Is idempotent — running twice doesn't double up.
 
 ### 3. Validate before publishing
 
@@ -57,107 +66,108 @@ place.
 python3 scripts/validate-html.py docs/v1.0.0/tech-design.html
 ```
 
-Confirms tag balance and that every button anchor has a matching `id` in the
-DOM. Exits non-zero if any anchor is broken — wire it into CI if you want.
+Confirms tag balance and anchor IDs.
+
+## Reviewer experience
+
+- The published doc renders normally — no extra buttons anywhere.
+- The reviewer selects any text → a small orange **"💬 添加评论"** bubble
+  appears above the selection.
+- Click → new tab opens GitLab's *New Issue* page with:
+  - **Title:** `[<prefix>] §<heading-text> · "<first 30 chars of selection>…"`
+  - **Description:** anchor link back to the section + selection quote + a
+    hidden `<!-- doc-comment-anchor-v1 ... -->` JSON block for any future
+    tooling that wants to re-locate the selection.
+  - **Label:** `doc-comments` (configurable).
+- GitLab authenticates the reviewer with their existing browser session.
+- Reviewer types under "Your comment:" and submits.
 
 ## Prerequisites
 
-- **Python 3.8+** — standard library only, no pip installs needed.
+- **Python 3.8+** — standard library only.
 - **GitLab project with Pages enabled** (default on `gitlab.com`; verify on
   self-hosted).
-- **Project Issues enabled** for the per-Issue discussion flow.
+- **Project Issues enabled** so reviewers can file new issues.
 
 ## File Structure
 
 ```
 skills/gitlab-docs-publishing/
-├── README.md                        # This file
-├── SKILL.md                         # Skill metadata & reference
+├── README.md
+├── SKILL.md
 ├── scripts/
-│   ├── inject-discuss-buttons.py    # Adds 💬 buttons to HTML
-│   └── validate-html.py             # Tag balance + anchor coverage
+│   ├── inject-comments.py      # Injects widget + ids into HTML
+│   ├── comment-widget.js       # Selection-bubble widget (~7 KB)
+│   ├── comment-widget.css      # Bubble styles (~1 KB)
+│   └── validate-html.py        # Tag balance + anchor coverage
 ├── templates/
-│   └── gitlab-ci-pages.yml          # Pages CI template
+│   └── gitlab-ci-pages.yml     # Pages CI template
 └── references/
-    ├── gotchas.md                   # Hard-learned pitfalls
-    └── discussion-model.md          # Per-Issue vs. shared-Issue tradeoffs
+    ├── gotchas.md              # Hard-learned pitfalls
+    └── discussion-model.md     # Per-Issue vs. shared-Issue tradeoffs
 ```
-
-## What Gets Injected
-
-| HTML element | Gets |
-|--------------|------|
-| `<h2 class="aws-sec-title">` | `id="sec-N"` + 💬 button |
-| `<h3 class="aws-sub">` / `<h4 class="aws-subsub">` | `id` derived from heading text + 💬 button |
-| `<div class="diagram-frame">` (mermaid figure) | `id="figure-N-M"` + inline 💬 in caption |
-| `<div class="aws-table-wrap">` | `id="table-N-M"` + 💬 below the table |
-
-Clicking a 💬 button opens GitLab's new-Issue page with a pre-filled title
-(e.g. `[v1.0.0-tech-design] §4.3 Caching Strategy`) and description body
-containing the anchor URL back to the exact section.
 
 ## Customizing
 
-### Different HTML class names
+### Title format
 
-Pass `--table-wrap-class` if your doc uses a class other than
-`aws-table-wrap`:
+Default: `[<titlePrefix>] §<heading-text> · "<first 30 chars>…"`. The widget
+walks back from the selection to find the deepest enclosing heading and uses
+its text. Edit `buildTitle()` in `scripts/comment-widget.js` if you want a
+different shape.
 
-```bash
-python3 scripts/inject-discuss-buttons.py \
-  --html my-doc.html \
-  --table-wrap-class my-table-wrap \
-  ...
-```
+### Different figure / table classes
 
-Heading-class assumptions (`aws-sec-title` / `aws-sub` / `aws-subsub`) are
-currently baked into the script — fork and edit the regexes if your doc uses
-a different convention.
+The injector looks for `<div class="diagram-frame">` and
+`<div class="aws-table-wrap">` to add `figure-N` / `table-N` ids. If your
+doc uses different classes, edit `DIAGRAM_FRAME_RE` / `TABLE_WRAP_RE` in
+`scripts/inject-comments.py`.
 
-### Skip appendix sections
+### Shared-Issue mode
 
-```bash
---skip-h2-titles '相关文档' 'Related Documents' 'Appendix'
-```
-
-Headings matching these titles won't get 💬 buttons.
-
-### Shared-Issue mode (one Issue for all discussions)
-
-By default each click creates a new Issue. For a single shared Issue, see
+By default each click creates a new Issue. To route all clicks into one
+shared Issue instead, see
 [`references/discussion-model.md`](./references/discussion-model.md).
 
 ## Troubleshooting
 
 ### Pages URL 404 after merge
 
-- **Settings → Pages** to confirm the exact URL for your instance (self-hosted
-  GitLab often uses `<project>-<hash>.pages.<host>`).
-- Check the `pages:` pipeline ran on the merge commit — if you used
-  `rules: changes:` it may have skipped. See
+- Check **Settings → Pages** for the exact URL — self-hosted and
+  proxy-fronted GitLab often serve at `<project>-<hash>.pages.<host>` rather
+  than at `<group>.<gitlab-host>`.
+- Confirm the `pages:` pipeline ran on the merge commit; if you used
+  `rules: changes:`, it may have skipped. See
   [`references/gotchas.md`](./references/gotchas.md).
 
-### Clicking a button takes me to the section heading but not the subsection
+### Bubble doesn't appear when I select text
 
-The injector must add `id`s to `h3`/`h4`, not just `h2`. Run
-`scripts/validate-html.py` — it lists any anchor whose `id` is missing.
+- Open the browser console; look for `Doc comments not yet enabled —
+  missing config: …` — means `comments-issue.json` is incomplete.
+- Confirm the widget loaded:
+  `document.querySelector('script[src*="comment-widget"]')` should return
+  the tag. If null, the inject step didn't run.
+- Check that `_assets/comment-widget.js` returns `200` from the network tab.
+
+### Title shows section id like `sec-1` instead of heading text
+
+The widget walks back through siblings to find the deepest enclosing
+heading. If your DOM nests headings unusually (e.g. headings live inside a
+sibling of the content rather than as a preceding sibling), the fallback is
+the anchor id. Adjust `findOwningHeading()` in `scripts/comment-widget.js`
+to match your structure.
+
+### Clicking opens GitLab but the section doesn't scroll into view
+
+- Confirm `id`s are present on `h3`/`h4` (run `scripts/validate-html.py`).
+- The `pageUrl` in `comments-issue.json` must end with `/` and match the
+  actual Pages URL for this document.
 
 ### Chinese / non-ASCII titles look mangled in the Issue form
 
-Make sure you ran the injector script, which URL-encodes via
-`urllib.parse.quote(text, safe='')`. Building the URL yourself with raw
-non-ASCII text will break in some browsers.
-
-### Buttons don't appear at all
-
-Confirm your HTML uses the expected classes (`aws-sec-title`, `aws-sub`,
-`aws-subsub`, `diagram-frame`, `aws-table-wrap`). Run a dry run to see
-counts:
-
-```bash
-python3 scripts/inject-discuss-buttons.py --dry-run \
-  --html ... --doc-url ... --issue-new-url ...
-```
+`URLSearchParams` (used by the widget) and `urllib.parse.quote` (used by
+the validator) handle this correctly. If you see mangled text, you likely
+constructed the URL by hand somewhere — keep using the included builders.
 
 ## License
 
