@@ -60,6 +60,8 @@ Once this repository is registered on [skills.sh](https://skills.sh/), you will 
 |-------|--------------|
 | [aws-cost-operations](skills/aws-cost-operations/) | Analyze AWS bills, set CloudWatch alarms, query logs, audit CloudTrail, and tighten operational excellence. |
 | [aws-agentic-ai](skills/aws-agentic-ai/) | Deploy and manage agents on Bedrock AgentCore — Gateway, Runtime, Memory, Identity, Code Interpreter, Browser, Observability, Registry, and Evaluations. |
+| [agentcore-mcp-oauth-facade](skills/agentcore-mcp-oauth-facade/) | Build an OAuth + MCP protocol facade in front of AgentCore Gateway/Runtime so strict MCP clients connect: OAuth discovery over Cognito, fake DCR, dual session-ids, tools/list pagination aggregation, tool-name prefixes, Gateway schema limits. |
+| [agentcore-browser-web-scraping](skills/agentcore-browser-web-scraping/) | Production web scraping on AgentCore Browser — Playwright over signed CDP, LLM-driven extraction with fixed tool primitives, login state via Browser Profiles + DCV live-view, login-wall detection, external proxy egress. |
 
 ### Engineering workflows
 
