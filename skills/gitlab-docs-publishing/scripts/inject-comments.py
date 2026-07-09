@@ -17,10 +17,51 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
-import shutil
 import sys
+import tempfile
 from pathlib import Path
+
+
+def _refuse_symlink(path: Path) -> None:
+    """Refuse to write through a symlink at the destination path.
+
+    A malicious source tree could plant a symlink at --out or inside
+    --assets-dir pointing at a file outside the public/ root; without this
+    guard we'd happily clobber that target with our HTML/JS/CSS.
+    """
+    try:
+        if path.is_symlink():
+            raise SystemExit(f'ERROR: refusing to write through symlink: {path}')
+    except OSError:
+        pass
+
+
+def _atomic_write_bytes(path: Path, data: bytes) -> None:
+    _refuse_symlink(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(prefix=path.name + '.', dir=str(path.parent))
+    try:
+        with os.fdopen(fd, 'wb') as f:
+            f.write(data)
+        # mkstemp creates files mode 0600; restore the umask-derived mode
+        # so Pages runners (which may serve under a different user than the
+        # one that wrote the file) can read the artifact.
+        umask = os.umask(0)
+        os.umask(umask)
+        os.chmod(tmp, 0o666 & ~umask)
+        os.replace(tmp, path)
+    except Exception:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+
+
+def _atomic_write_text(path: Path, text: str) -> None:
+    _atomic_write_bytes(path, text.encode('utf-8'))
 
 INJECTED_META = '<meta name="doc-comments-injected" content="v1">'
 SCRIPT_NAME = 'comment-widget.js'
@@ -140,7 +181,16 @@ def build_config_snippet(
         'titlePrefix': title_prefix,
         'issueLabels': issue_labels,
     }
-    js = json.dumps(payload, ensure_ascii=False)
+    # json.dumps does NOT escape '</script>', '<!--', or U+2028/U+2029,
+    # any of which can break out of an inline <script>...</script> block
+    # and turn an attacker-controlled config value into stored XSS.
+    js = (
+        json.dumps(payload, ensure_ascii=False)
+        .replace('</', '<\\/')
+        .replace('<!--', '<\\!--')
+        .replace(' ', '\\u2028')
+        .replace(' ', '\\u2029')
+    )
     return f'<script>window.__DOC_COMMENTS_CONFIG__ = {js};</script>'
 
 
@@ -229,12 +279,12 @@ def main() -> int:
 
     # 5. Write output + copy widget assets
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(html, encoding='utf-8')
+    _atomic_write_text(out_path, html)
 
     assets_dir.mkdir(parents=True, exist_ok=True)
     here = Path(__file__).parent
     for name in (SCRIPT_NAME, STYLE_NAME):
-        shutil.copy2(here / name, assets_dir / name)
+        _atomic_write_bytes(assets_dir / name, (here / name).read_bytes())
 
     print(f'OK: wrote {out_path} ({out_path.stat().st_size} bytes)')
     print(f'OK: copied assets to {assets_dir}/')
