@@ -1,0 +1,154 @@
+name: Skill Security Scan
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'skills/**'
+      - '.github/workflows/skill-security-scan.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - '.github/workflows/skill-security-scan.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: skill-security-scan-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  snyk-agent-scan:
+    name: Snyk Agent Scan
+    if: github.event_name != 'pull_request_target' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check Snyk configuration
+        id: snyk
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          if [ -n "$SNYK_TOKEN" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::SNYK_TOKEN is not configured; skill security scanning was skipped."
+            {
+              echo "### Snyk Agent Scan"
+              echo
+              echo "Skipped because the repository secret \`SNYK_TOKEN\` is not configured."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Check out scanned revision
+        if: steps.snyk.outputs.enabled == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Select changed skills
+        if: steps.snyk.outputs.enabled == 'true'
+        id: targets
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] || [ -z "$BASE_SHA" ] || [[ "$BASE_SHA" =~ ^0+$ ]]; then
+            find skills -mindepth 2 -maxdepth 2 -name SKILL.md -type f | sort > /tmp/skill-files
+          else
+            if ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+              git fetch --no-tags https://github.com/${{ github.repository }}.git "$BASE_SHA"
+            fi
+
+            git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- skills \
+              | awk -F/ '$1 == "skills" && $2 ~ /^[a-z0-9-]+$/ { print $1 "/" $2 "/SKILL.md" }' \
+              | sort -u \
+              | while IFS= read -r skill_file; do
+                  if [ -f "$skill_file" ]; then
+                    printf '%s\n' "$skill_file"
+                  fi
+                done > /tmp/skill-files
+          fi
+
+          while IFS= read -r skill_file; do
+            if [ -L "$skill_file" ] || [[ ! "$skill_file" =~ ^skills/[a-z0-9-]+/SKILL\.md$ ]]; then
+              echo "Invalid skill path: $skill_file" >&2
+              exit 1
+            fi
+          done < /tmp/skill-files
+
+          if [ -s /tmp/skill-files ]; then
+            echo "scan=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "### Skills selected for scanning"
+              echo
+              sed 's/^/- `/' /tmp/skill-files | sed 's/$/`/'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "scan=false" >> "$GITHUB_OUTPUT"
+            echo "No changed skills require scanning." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Install Snyk Agent Scan
+        if: steps.snyk.outputs.enabled == 'true' && steps.targets.outputs.scan == 'true'
+        run: python3 -m pip install --disable-pip-version-check snyk-agent-scan==0.6.0
+
+      - name: Scan changed skills
+        if: steps.snyk.outputs.enabled == 'true' && steps.targets.outputs.scan == 'true'
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          set -euo pipefail
+          mapfile -t skill_files < /tmp/skill-files
+          snyk-agent-scan scan --json "${skill_files[@]}" > snyk-agent-scan.json
+
+          risk_count=$(jq '[
+            .scan_path_responses[]?
+            | .skill_risks[]?
+            | (.risk_indexes // {})
+            | keys[]
+          ] | length' snyk-agent-scan.json)
+
+          failure_count=$(jq '[
+            (.scan_path_responses[]? | .error? | select(.is_failure == true)),
+            (.scan_path_responses[]? | .skill_risks[]? | .error? | select(.is_failure == true))
+          ] | length' snyk-agent-scan.json)
+
+          {
+            echo "### Snyk Agent Scan results"
+            echo
+            echo "Security risks: **$risk_count**"
+            echo
+            echo "Operational failures: **$failure_count**"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$risk_count" -ne 0 ]; then
+            {
+              echo
+              echo "#### Reported risks"
+              echo
+              jq -r '
+                .scan_path_responses[]?
+                | .skill_risks[]?
+                | .name as $skill
+                | (.risk_indexes // {})
+                | to_entries[]
+                | "- `\($skill)`: `\(.key)` (score \(.value.score)/1000)"
+              ' snyk-agent-scan.json
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ "$risk_count" -ne 0 ] || [ "$failure_count" -ne 0 ]; then
+            exit 1
+          fi
