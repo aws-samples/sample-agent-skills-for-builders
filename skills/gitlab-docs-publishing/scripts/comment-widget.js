@@ -22,6 +22,18 @@
     showSetupBanner('Doc comments not yet enabled — missing config: ' + missing.join(', '));
     return;
   }
+  // Reject anything that isn't an http(s) URL — keeps a `javascript:` host
+  // from turning the bubble into an XSS sink if the config is ever tampered
+  // with (e.g. via a <script>-context injection in inject-comments.py).
+  try {
+    var hostUrl = new URL(cfg.gitlabHost);
+    if (hostUrl.protocol !== 'https:' && hostUrl.protocol !== 'http:') {
+      throw new Error('unsupported scheme: ' + hostUrl.protocol);
+    }
+  } catch (e) {
+    showSetupBanner('Doc comments disabled — invalid gitlabHost: ' + cfg.gitlabHost);
+    return;
+  }
   var TITLE_PREFIX = cfg.titlePrefix || '[doc-comment]';
   var ISSUE_LABELS = cfg.issueLabels || 'doc-comments';
 
