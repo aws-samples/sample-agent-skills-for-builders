@@ -19,28 +19,33 @@ import argparse
 import json
 import os
 import re
+import stat
 import sys
 import tempfile
 from pathlib import Path
 
 
 def _refuse_symlink(path: Path) -> None:
-    """Refuse to write through a symlink at the destination path.
+    """Refuse to write through a symlink in the destination path.
 
-    A malicious source tree could plant a symlink at --out or inside
-    --assets-dir pointing at a file outside the public/ root; without this
-    guard we'd happily clobber that target with our HTML/JS/CSS.
+    Checking only the final filename is insufficient because an assets or
+    output directory can itself be a symlink to a location outside public/.
     """
-    try:
-        if path.is_symlink():
-            raise SystemExit(f'ERROR: refusing to write through symlink: {path}')
-    except OSError:
-        pass
+    absolute_path = path.absolute()
+    for component in (absolute_path, *absolute_path.parents):
+        try:
+            mode = component.lstat().st_mode
+        except FileNotFoundError:
+            continue
+        if stat.S_ISLNK(mode):
+            raise SystemExit(f'ERROR: refusing to write through symlink: {component}')
 
 
 def _atomic_write_bytes(path: Path, data: bytes) -> None:
+    path = path.absolute()
     _refuse_symlink(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    _refuse_symlink(path)
     fd, tmp = tempfile.mkstemp(prefix=path.name + '.', dir=str(path.parent))
     try:
         with os.fdopen(fd, 'wb') as f:
@@ -278,10 +283,8 @@ def main() -> int:
     html = inject_assets(html, args.assets_url, snippet)
 
     # 5. Write output + copy widget assets
-    out_path.parent.mkdir(parents=True, exist_ok=True)
     _atomic_write_text(out_path, html)
 
-    assets_dir.mkdir(parents=True, exist_ok=True)
     here = Path(__file__).parent
     for name in (SCRIPT_NAME, STYLE_NAME):
         _atomic_write_bytes(assets_dir / name, (here / name).read_bytes())
