@@ -62,6 +62,7 @@ Once this repository is registered on [skills.sh](https://skills.sh/), you will 
 | [aws-agentic-ai](skills/aws-agentic-ai/) | Deploy and manage agents on Bedrock AgentCore — Gateway, Runtime, Memory, Identity, Code Interpreter, Browser, Observability, Registry, and Evaluations. |
 | [agentcore-mcp-oauth-facade](skills/agentcore-mcp-oauth-facade/) | Build an OAuth + MCP protocol facade in front of AgentCore Gateway/Runtime so strict MCP clients connect: OAuth discovery over Cognito, fake DCR, dual session-ids, tools/list pagination aggregation, tool-name prefixes, Gateway schema limits. |
 | [agentcore-browser-web-scraping](skills/agentcore-browser-web-scraping/) | Production web scraping on AgentCore Browser — Playwright over signed CDP, LLM-driven extraction with fixed tool primitives, login state via Browser Profiles + DCV live-view, login-wall detection, external proxy egress. |
+| [agentic-responsible-ai-assessment](skills/agentic-responsible-ai-assessment/) | Run a Responsible AI assessment for agentic systems — 20 questions across three maturity phases, scored 0–5 over eight RAI dimensions (Governance, Privacy & Security, Safety, Veracity & Robustness, Controllability, Fairness, Explainability, Transparency), with a live posture chart (Highcharts / Mermaid / ASCII per client). |
 
 ### Engineering workflows
 
