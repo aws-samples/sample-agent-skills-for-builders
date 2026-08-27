@@ -53,6 +53,7 @@ Once this repository is registered on [skills.sh](https://skills.sh/), you will 
 | [create-install-scripts](skills/create-install-scripts/) | Generate interactive `install.sh`, GitLab CI pipelines, and CodeBuild setup for CDK projects. |
 | [cost-estimator](skills/cost-estimator/) | Estimate CDK infrastructure cost before deploy using real-time AWS Price List data. Produces Markdown and Excel reports. |
 | [security-scan](skills/security-scan/) | Aggregated SAST / IaC / secrets / license / container scanning for CDK projects via the Automated Security Helper (ASH). |
+| [api-gateway-authorizer-security](skills/api-gateway-authorizer-security/) | Prioritize Cognito/OIDC JWT and other business authorizers, using an always-allow Lambda authorizer only as a documented fallback for public routes. |
 
 ### AWS operations & AI
 
